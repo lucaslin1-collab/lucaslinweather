@@ -1,0 +1,90 @@
+{
+  "generated": "2026-11-19T21:26",
+  "period": [
+    "2026-03-24",
+    "2026-11-18"
+  ],
+  "overall": {
+    "days": 719,
+    "markets": 4312,
+    "quoted_markets": 1110,
+    "rmse_raw": 2.508850127373453,
+    "rmse_model": 1.955128571022395,
+    "coverage80": 0.7938718662952646,
+    "brier_market": 0.08639873873873874,
+    "brier_model": 0.11110282928148099,
+    "bss_model": -0.2859311478775748,
+    "trades": 0,
+    "verdict": "unproven"
+  },
+  "model_only": {
+    "days": 719,
+    "markets": 4312,
+    "quoted_markets": 1110,
+    "rmse_raw": 2.508850127373453,
+    "rmse_model": 1.955128571022395,
+    "coverage80": 0.7938718662952646,
+    "brier_market": 0.08639873873873874,
+    "brier_model": 0.11110282928148099,
+    "bss_model": -0.2859311478775748,
+    "trades": 348,
+    "win_rate": 0.29022988505747127,
+    "pnl": -18.650000000000002,
+    "pnl_per_trade": -0.05359195402298851,
+    "ci90": [
+      -32.80100000000001,
+      -4.503000000000011
+    ],
+    "verdict": "no edge"
+  },
+  "cities": {
+    "KXHIGHMIA": {
+      "days": 240,
+      "markets": 1438,
+      "quoted_markets": 372,
+      "rmse_raw": 2.714768291378049,
+      "rmse_model": 1.5603301504962592,
+      "coverage80": 0.7573221757322176,
+      "brier_market": 0.09213212365591399,
+      "brier_model": 0.10928112220290019,
+      "bss_model": -0.18613484489983767,
+      "trades": 0,
+      "verdict": "unproven",
+      "city": "Miami"
+    },
+    "KXHIGHNY": {
+      "days": 239,
+      "markets": 1434,
+      "quoted_markets": 366,
+      "rmse_raw": 2.57315418174849,
+      "rmse_model": 2.1822034617793142,
+      "coverage80": 0.8284518828451883,
+      "brier_market": 0.08063428961748634,
+      "brier_model": 0.10145459579412464,
+      "bss_model": -0.2582066050982261,
+      "trades": 0,
+      "verdict": "unproven",
+      "city": "New York (Central Park)"
+    },
+    "KXHIGHTHOU": {
+      "days": 240,
+      "markets": 1440,
+      "quoted_markets": 372,
+      "rmse_raw": 2.2130840540053134,
+      "rmse_model": 2.066173436973399,
+      "coverage80": 0.7958333333333333,
+      "brier_market": 0.08633682795698924,
+      "brier_model": 0.12241715317826722,
+      "bss_model": -0.41790190901213387,
+      "trades": 0,
+      "verdict": "unproven",
+      "city": "Houston (Hobby)"
+    }
+  },
+  "equity": [],
+  "blend_weights": {
+    "model": -0.049723074514858724,
+    "market": 1.1604606266558668,
+    "intercept": 0.021907819249965755
+  }
+}
