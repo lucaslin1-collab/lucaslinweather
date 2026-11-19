@@ -68,6 +68,7 @@ jobs:
           git add data results
           if ! git diff --cached --quiet; then
             git commit -m "Data update $(date -u +%Y-%m-%d)"
+            git pull --rebase origin main
             git push
           fi
 

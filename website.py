@@ -22,6 +22,8 @@ def nav(current):
     links = "".join(
         f'<li><a class="nav" href="{href}"{current_attr if href == current else ""}>{label}</a></li>'
         for href, label in PAGES)
+    if config.HUB_URL:
+        links += f'<li><a class="nav" href="{config.HUB_URL}">All bots</a></li>'
     return (f'<nav class="site-nav" aria-label="Site"><a class="brand" href="index.html">{MARK}'
             f'<span>{esc(config.SITE_NAME)}</span></a><ul>{links}</ul></nav>')
 

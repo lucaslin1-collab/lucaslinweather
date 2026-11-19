@@ -76,3 +76,4 @@ SITE_NAME = "Lucas Lin Weather"
 SITE_URL = os.environ.get("SITE_URL", "").rstrip("/")
 SITE_DOMAIN = os.environ.get("SITE_DOMAIN", "")
 SITE_DIR = "site"
+HUB_URL = "/"   # front page linking all bots (on github.io); set "" to hide the link

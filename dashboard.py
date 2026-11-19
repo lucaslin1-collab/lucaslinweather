@@ -53,8 +53,8 @@ def bracket_chart(panel, picked):
     scale = (base - top) / ymax
     gw = W / len(b)
     bw = min(16, (gw - 10) / 2)
-    parts = [f'<line class="grid" x1="0" x2="{W}" y1="{base - 0.25 * scale:.1f}" y2="{base - 0.25 * scale:.1f}"/>',
-             f'<text class="tick" x="0" y="{base - 0.25 * scale - 3:.1f}">25%</text>']
+    parts = [f'<line class="grid" x1="0" x2="{W}" y1="{base - 0.25 * scale:.1f}" y2="{base - 0.25 * scale:.1f}"/>']
+    tick = f'<text class="tick halo" x="0" y="{base - 0.25 * scale - 3:.1f}">25%</text>'
     for i, br in enumerate(b):
         cx = gw * i + gw / 2
         mk = br["market"]
@@ -69,6 +69,7 @@ def bracket_chart(panel, picked):
         parts.append(f'<rect class="hit" x="{gw * i:.1f}" y="0" width="{gw:.1f}" height="{base}" '
                      f'tabindex="0" data-tip="{esc(tip)}"/>')
     parts.append(f'<line class="axis" x1="0" x2="{W}" y1="{base}" y2="{base}"/>')
+    parts.append(tick)   # drawn last so bars never hide it
     return (f'<svg viewBox="0 0 {W} {H}" class="bars" role="img" '
             f'aria-label="AI probability versus market price by bracket">{"".join(parts)}</svg>')
 
@@ -373,6 +374,7 @@ svg{display:block;width:100%;height:auto;overflow:visible}
 svg .grid{stroke:var(--grid);stroke-width:1}
 svg .axis{stroke:var(--axis);stroke-width:1}
 svg .tick{fill:var(--muted);font-size:10px;font-family:Barlow,sans-serif}
+svg .halo{paint-order:stroke;stroke:var(--surface);stroke-width:3px}
 svg .xlab{fill:var(--ink-2);font-size:10.5px;font-family:Barlow,sans-serif;font-variant-numeric:tabular-nums}
 svg .pickmark{fill:var(--ink);font-size:10px;font-weight:600;font-family:Barlow,sans-serif}
 svg .s-model{fill:var(--model)} svg .s-market{fill:var(--market)}
