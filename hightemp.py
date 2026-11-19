@@ -40,7 +40,11 @@ def cmd_setup(args):
     print(f"  {len(cities)} cities: " + ", ".join(c["city"] for c in cities.values()))
 
     print("Downloading weather history (forecast archive + official highs) ...")
+    from budget import out_of_time
     for n, (series, city) in enumerate(cities.items(), 1):
+        if out_of_time(reserve_min=60):
+            print("  time budget reached; remaining cities continue next run")
+            break
         try:
             update_weather(city)
             print(f"  [{n}/{len(cities)}] {city['city']}")
@@ -60,10 +64,28 @@ def cmd_setup(args):
     print("\nSetup done. Run `python hightemp.py daily` each morning.")
 
 
+def backtest_is_stale(cities):
+    """Re-run when the backtest is a week old or misses cities that now have data."""
+    import json
+    from data_store import load_markets, load_weather
+    path = os.path.join(config.RESULTS_DIR, "backtest.json")
+    if not os.path.exists(path):
+        return True
+    s = json.load(open(path))
+    if pd.Timestamp.now() - pd.Timestamp(s.get("generated", "2000-01-01")) > pd.Timedelta(days=6):
+        return True
+    ready = {c for c in cities if not load_weather(c).empty and not load_markets(c).empty}
+    return bool(ready - set(s.get("cities", {})))
+
+
 def cmd_backtest(args):
     from cities import load_cities
     import backtest
-    backtest.run(load_cities())
+    cities = load_cities()
+    if getattr(args, "if_stale", False) and not backtest_is_stale(cities):
+        print("Backtest is up to date.")
+        raise SystemExit(10)
+    backtest.run(cities)
 
 
 def cmd_daily(args):
@@ -121,7 +143,9 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("setup").set_defaults(fn=cmd_setup)
-    sub.add_parser("backtest").set_defaults(fn=cmd_backtest)
+    bt = sub.add_parser("backtest")
+    bt.add_argument("--if-stale", action="store_true", help="only run if a week old or cities were added")
+    bt.set_defaults(fn=cmd_backtest)
     d = sub.add_parser("daily")
     d.add_argument("--no-update", action="store_true", help="skip downloading new data")
     d.add_argument("--open", action="store_true", help="open the dashboard in your browser")

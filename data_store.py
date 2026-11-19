@@ -8,6 +8,7 @@ import pandas as pd
 import config
 from kalshi_client import dollars, to_unix
 from model import implied_result
+from budget import out_of_time
 from weather import fetch_forecasts, fetch_observed
 
 SUPPORTED = {"between", "less", "less_or_equal", "greater", "greater_or_equal"}
@@ -94,6 +95,17 @@ def load_markets(series):
     return pd.read_csv(path, parse_dates=["date"])
 
 
+def close_price(q):
+    """Closing price in dollars. Live candles use `close_dollars`; archived candles use
+    `close` (also dollars). Older formats gave whole cents."""
+    q = q or {}
+    v = q.get("close_dollars", q.get("close"))
+    if v is None or v == "":
+        return None
+    v = float(v)
+    return v / 100 if v > 1 else v
+
+
 def fetch_decision_quotes(client, rows, cities, cutoff_ts):
     """YES bid/ask from the last hourly candle at or before each market's decision time.
     Recent markets are fetched 100 at a time; archived ones need one call each."""
@@ -107,8 +119,7 @@ def fetch_decision_quotes(client, rows, cities, cutoff_ts):
         if not usable:
             return (None, None)
         last = max(usable, key=lambda c: c["end_period_ts"])
-        return (dollars((last.get("yes_bid") or {}).get("close_dollars")),
-                dollars((last.get("yes_ask") or {}).get("close_dollars")))
+        return close_price(last.get("yes_bid")), close_price(last.get("yes_ask"))
 
     live = rows[~archived]
     for _, day in live.groupby("date"):
@@ -125,6 +136,9 @@ def fetch_decision_quotes(client, rows, cities, cutoff_ts):
 
     old = rows[archived]
     for n, r in enumerate(old.itertuples(), 1):
+        if out_of_time(reserve_min=25):
+            print(f"    time budget reached: {len(old) - n + 1} archived prices left for the next run")
+            break
         try:
             candles = client.historical_candlesticks(r.ticker, r.decision_ts - 12 * 3600, r.decision_ts)
             quotes[r.ticker] = pick(candles, r.decision_ts)
@@ -135,6 +149,7 @@ def fetch_decision_quotes(client, rows, cities, cutoff_ts):
 
     rows["yes_bid"] = [quotes.get(t, (None, None))[0] for t in rows["ticker"]]
     rows["yes_ask"] = [quotes.get(t, (None, None))[1] for t in rows["ticker"]]
+    rows["quote_tried"] = [1 if t in quotes else 0 for t in rows["ticker"]]
     return rows.drop(columns="decision_ts")
 
 
@@ -156,10 +171,21 @@ def update_markets(client, cities, history_days=None):
         rows = [r for r in rows if r["date"] >= since and r["result"] is not None]
         known = set(existing["ticker"]) if not existing.empty else set()
         rows = [r for r in rows if r["ticker"] not in known]
-        print(f"  {series}: {len(rows)} new settled markets")
-        if not rows:
+        # markets stored earlier without a price (e.g. an interrupted run) get one more try
+        if not existing.empty:
+            tried = existing["quote_tried"] if "quote_tried" in existing else pd.Series(0, index=existing.index)
+            retry = existing[existing["yes_bid"].isna() & (tried.fillna(0) == 0)]
+        else:
+            retry = pd.DataFrame()
+        print(f"  {series}: {len(rows)} new settled markets" + (f", re-pricing {len(retry)}" if len(retry) else ""))
+        if not rows and retry.empty:
             continue
-        new = fetch_decision_quotes(client, pd.DataFrame(rows), cities, cutoff)
+        if out_of_time(reserve_min=25):
+            print("    time budget reached; continuing next run")
+            break
+        todo = pd.concat([pd.DataFrame(rows), retry.drop(columns=["yes_bid", "yes_ask", "quote_tried"], errors="ignore")],
+                         ignore_index=True)
+        new = fetch_decision_quotes(client, todo, cities, cutoff)
         combined = pd.concat([existing, new], ignore_index=True) if not existing.empty else new
         combined = combined.drop_duplicates("ticker", keep="last").sort_values(["date", "ticker"])
         os.makedirs(_dir("markets"), exist_ok=True)

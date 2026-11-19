@@ -10,17 +10,6 @@
     "fee_multiplier": 1.0,
     "title": "Highest temperature in Austin"
   },
-  "KXHIGHHOU": {
-    "series": "KXHIGHHOU",
-    "city": "Houston (Hobby)",
-    "station": "KHOU",
-    "lat": 29.6375,
-    "lon": -95.2825,
-    "tz": "America/Chicago",
-    "std_offset": -6.0,
-    "fee_multiplier": 1.0,
-    "title": "Highest temperature in Houston"
-  },
   "KXHIGHCHI": {
     "series": "KXHIGHCHI",
     "city": "Chicago (Midway)",
@@ -64,17 +53,6 @@
     "std_offset": -5.0,
     "fee_multiplier": 1.0,
     "title": "Boston Maximum Daily Temperature"
-  },
-  "KXHIGHOU": {
-    "series": "KXHIGHOU",
-    "city": "Houston (Hobby)",
-    "station": "KHOU",
-    "lat": 29.6375,
-    "lon": -95.2825,
-    "tz": "America/Chicago",
-    "std_offset": -6.0,
-    "fee_multiplier": 1.0,
-    "title": "Highest temperature in Houston"
   },
   "KXHIGHTTTN": {
     "series": "KXHIGHTTTN",

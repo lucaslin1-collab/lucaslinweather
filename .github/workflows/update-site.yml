@@ -46,19 +46,22 @@ jobs:
       - name: Run the AI
         env:
           MODE: ${{ github.event.inputs.mode || 'daily' }}
+          PYTHONUNBUFFERED: "1"
+          TIME_BUDGET_MIN: "240"   # long downloads stop here and continue next run
           SITE_URL: ${{ steps.pages.outputs.base_url }}
           SITE_DOMAIN: ${{ vars.SITE_DOMAIN }}
         run: |
           if [ "$MODE" = "setup" ] || [ ! -f results/backtest.json ]; then
             python hightemp.py setup
             python hightemp.py daily --no-update
-          elif [ "$MODE" = "backtest" ] || [ "$(date -u +%u)" = "1" ]; then
-            # Mondays: refresh data, re-score every city, then publish
+          elif [ "$MODE" = "backtest" ]; then
             python hightemp.py daily
             python hightemp.py backtest
             python hightemp.py daily --no-update
           else
+            # Update data and publish; re-score cities weekly or when new cities have data
             python hightemp.py daily
+            if python hightemp.py backtest --if-stale; then python hightemp.py daily --no-update; fi
           fi
 
       - name: Save data back to the repo

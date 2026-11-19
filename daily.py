@@ -156,7 +156,11 @@ def run(client, cities, update=True):
     from data_store import update_markets, update_weather
     if update:
         print("Updating weather ...")
+        from budget import out_of_time
         for series, city in cities.items():
+            if out_of_time(reserve_min=60):
+                print("  time budget reached; remaining cities continue next run")
+                break
             try:
                 update_weather(city)
             except Exception as err:  # noqa: BLE001

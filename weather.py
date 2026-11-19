@@ -13,18 +13,27 @@ IEM_CLI_URL = "https://mesonet.agron.iastate.edu/json/cli.py"
 _KEY = re.compile(r"^temperature_2m_previous_day(\d+)(?:_(.+))?$")
 
 
-def _get(url, params, tries=5):
+def _get(url, params, tries=6):
+    """GET with retries on rate limits, server errors and timeouts (the forecast
+    archive can be slow)."""
+    last_err = None
     for attempt in range(tries):
-        resp = requests.get(url, params=params, timeout=90)
+        try:
+            resp = requests.get(url, params=params, timeout=180)
+        except (requests.Timeout, requests.ConnectionError) as err:
+            last_err = err
+            time.sleep(10 * (attempt + 1))
+            continue
         if resp.status_code == 429 or resp.status_code >= 500:
-            time.sleep(5 * (attempt + 1))
+            last_err = requests.HTTPError(f"HTTP {resp.status_code}")
+            time.sleep(10 * (attempt + 1))
             continue
         resp.raise_for_status()
         return resp.json()
-    resp.raise_for_status()
+    raise last_err
 
 
-def fetch_forecasts(city, start, end, chunk_days=120):
+def fetch_forecasts(city, start, end, chunk_days=45):
     """Daily max of each model's hourly 2 m temperature (°F), as forecast 1 and 2 days earlier.
 
     Days are local STANDARD time, matching the NWS climate day Kalshi settles on.

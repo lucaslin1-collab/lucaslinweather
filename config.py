@@ -60,6 +60,11 @@ BASE_FEE_RATE = 0.07           # taker fee = rate x series fee_multiplier x C x 
 KELLY_FRACTION = 0.25          # suggested stake = this fraction of the Kelly bet...
 MAX_STAKE_PCT = 0.02           # ...capped at this share of bankroll
 
+# --- Run time budget ----------------------------------------------------------------
+# Long downloads stop after this many minutes so the run can save its progress; the next
+# run continues where this one stopped. Unset = no limit (local runs).
+TIME_BUDGET_MIN = float(os.environ.get("TIME_BUDGET_MIN", "0") or 0)
+
 # --- Backtest ------------------------------------------------------------------------
 MIN_TRAIN_DAYS = 120
 MIN_BLEND_DAYS = 45
