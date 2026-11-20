@@ -20,30 +20,34 @@ MODELS = ["gfs_seamless", "ecmwf_ifs025", "ecmwf_ifs", "ecmwf_aifs025_single", "
           "knmi_seamless", "knmi_harmonie_arome_netherlands", "knmi_harmonie_arome_europe", "dmi_seamless",
           "dmi_harmonie_arome_europe", "cma_grapes_global", "jma_seamless", "jma_gsm", "jma_msm",
           "ncep_nbm_conus", "gfs_hrrr", "ncep_hrrr_conus", "kma_seamless", "metno_seamless", "bom_access_global"]
-WINDOWS = {"2024-02": ("2024-02-01", "2024-02-03"), "2025-01": ("2025-01-10", "2025-01-12"),
+WINDOWS = {"2024-02": ("2024-02-01", "2024-02-02"), "2025-01": ("2025-01-10", "2025-01-11"),
            "recent": ((pd.Timestamp.utcnow() - pd.Timedelta(days=10)).strftime("%Y-%m-%d"),
                       (pd.Timestamp.utcnow() - pd.Timedelta(days=8)).strftime("%Y-%m-%d"))}
 
-out = {"open_meteo": {}, "iem_mos": {}, "hko": None}
-for place, (lat, lon) in PLACES.items():
-    res = {}
-    for model in MODELS:
-        row = {}
-        for wname, (s, e) in WINDOWS.items():
-            try:
-                r = requests.get(PREV, params={"latitude": lat, "longitude": lon, "models": model,
-                                               "hourly": "temperature_2m_previous_day1", "timezone": "GMT",
-                                               "start_date": s, "end_date": e}, timeout=60)
-                if r.status_code != 200:
-                    row[wname] = f"HTTP {r.status_code}: {r.text[:80]}"
-                    continue
-                vals = r.json().get("hourly", {}).get("temperature_2m_previous_day1", [])
-                row[wname] = sum(v is not None for v in vals)
-            except Exception as err:  # noqa: BLE001
-                row[wname] = f"error {err}"[:100]
-        res[model] = row
-    out["open_meteo"][place] = res
-    print(place, "done")
+from concurrent.futures import ThreadPoolExecutor
+
+
+def probe(place, model, wname):
+    lat, lon = PLACES[place]
+    s, e = WINDOWS[wname]
+    try:
+        r = requests.get(PREV, params={"latitude": lat, "longitude": lon, "models": model,
+                                       "hourly": "temperature_2m_previous_day1", "timezone": "GMT",
+                                       "start_date": s, "end_date": e}, timeout=25)
+        if r.status_code != 200:
+            return place, model, wname, f"HTTP {r.status_code}: {r.text[:80]}"
+        vals = r.json().get("hourly", {}).get("temperature_2m_previous_day1", [])
+        return place, model, wname, sum(v is not None for v in vals)
+    except Exception as err:  # noqa: BLE001
+        return place, model, wname, f"error {err}"[:100]
+
+
+out = {"open_meteo": {p: {m: {} for m in MODELS} for p in PLACES}, "iem_mos": {}, "hko": None}
+jobs = [(p, m, w) for p in PLACES for m in MODELS for w in WINDOWS]
+with ThreadPoolExecutor(max_workers=6) as ex:
+    for place, model, wname, val in ex.map(lambda a: probe(*a), jobs):
+        out["open_meteo"][place][model][wname] = val
+print("open-meteo probes:", len(jobs))
 
 # NWS station guidance (MOS / NBM text) archived by Iowa State
 for model in ["NBS", "NBE", "GFS", "MEX", "LAV", "NAM"]:
