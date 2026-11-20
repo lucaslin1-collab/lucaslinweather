@@ -1,0 +1,351 @@
+{
+  "open_meteo": {
+    "New York (KNYC)": {
+      "ecmwf_ifs025": {
+        "2024-02-01": 0,
+        "2025-01-10": 24,
+        "recent": 24
+      },
+      "ecmwf_ifs": {
+        "2024-02-01": 0,
+        "2025-01-10": 0,
+        "recent": 24
+      },
+      "ecmwf_aifs025_single": {
+        "2024-02-01": 0,
+        "2025-01-10": 0,
+        "recent": 24
+      },
+      "gfs_seamless": {
+        "2024-02-01": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o",
+        "2025-01-10": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o",
+        "recent": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o"
+      },
+      "icon_seamless": {
+        "2024-02-01": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o",
+        "2025-01-10": 24,
+        "recent": 24
+      },
+      "gem_seamless": {
+        "2024-02-01": 24,
+        "2025-01-10": 24,
+        "recent": 24
+      },
+      "ncep_nbm_conus": {
+        "2024-02-01": 0,
+        "2025-01-10": 24,
+        "recent": 24
+      },
+      "gfs_hrrr": {
+        "2024-02-01": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o",
+        "2025-01-10": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o",
+        "recent": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o"
+      },
+      "ncep_hrrr_conus": {
+        "2024-02-01": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o",
+        "2025-01-10": 24,
+        "recent": 24
+      },
+      "gfs_graphcast025": {
+        "2024-02-01": 0,
+        "2025-01-10": 0,
+        "recent": 0
+      }
+    },
+    "London (EGLL)": {
+      "ecmwf_ifs025": {
+        "2024-02-01": 0,
+        "2025-01-10": 24,
+        "recent": 24
+      },
+      "ecmwf_ifs": {
+        "2024-02-01": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o",
+        "2025-01-10": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o",
+        "recent": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o"
+      },
+      "ecmwf_aifs025_single": {
+        "2024-02-01": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o",
+        "2025-01-10": 0,
+        "recent": 24
+      },
+      "gfs_seamless": {
+        "2024-02-01": 24,
+        "2025-01-10": 24,
+        "recent": 24
+      },
+      "icon_seamless": {
+        "2024-02-01": 24,
+        "2025-01-10": 24,
+        "recent": 24
+      },
+      "gem_seamless": {
+        "2024-02-01": 24,
+        "2025-01-10": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o",
+        "recent": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o"
+      },
+      "ukmo_seamless": {
+        "2024-02-01": 0,
+        "2025-01-10": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o",
+        "recent": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o"
+      },
+      "ukmo_uk_deterministic_2km": {
+        "2024-02-01": 0,
+        "2025-01-10": 24,
+        "recent": 24
+      },
+      "knmi_seamless": {
+        "2024-02-01": 0,
+        "2025-01-10": 24,
+        "recent": 24
+      },
+      "meteofrance_seamless": {
+        "2024-02-01": 24,
+        "2025-01-10": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o",
+        "recent": "error HTTPSConnectionPool(host='previous-runs-api.open-meteo.com', port=443): Read timed o"
+      }
+    },
+    "Paris (LFPG)": {},
+    "Hong Kong (VHHH)": {},
+    "Tokyo (RJTT)": {},
+    "Beijing (ZBAA)": {}
+  },
+  "iem_mos": {
+    "NBS 2024-02-01": {
+      "http": 200,
+      "rows": 92,
+      "columns": [
+        "runtime",
+        "ftime",
+        "model",
+        "tmp",
+        "dpt",
+        "wdr",
+        "wsp",
+        "p06",
+        "p12",
+        "q06",
+        "q12",
+        "t06_1",
+        "t06_2",
+        "t12_1",
+        "t12_2",
+        "cig",
+        "vis",
+        "sky",
+        "gst",
+        "t03",
+        "pzr",
+        "psn",
+        "ppl",
+        "pra",
+        "s06",
+        "slv",
+        "i06",
+        "lcb",
+        "station",
+        "dur",
+        "mht",
+        "twd",
+        "tws",
+        "hid",
+        "sol",
+        "txn",
+        "xnd",
+        "tsd",
+        "dsd",
+        "ssd",
+        "gsd",
+        "ifc",
+        "ifv",
+        "wsd"
+      ],
+      "sample": "runtime,ftime,model,tmp,dpt,wdr,wsp,p06,p12,q06,q12,t06_1,t06_2,t12_1,t12_2,cig,vis,sky,gst,t03,pzr,psn,ppl,pra,s06,slv,i06,lcb,station,dur,mht,twd,tws,hid,sol,txn,xnd,tsd,dsd,ssd,gsd,ifc,ifv,wsd\n2024-02-01 01:00:00,2024-02-01 06:00:00,NBS,37,29,240,4,,,,,0.0,,,,45,100,64,6,0,0,0,0,12,,6,,35,KNYC,,4,24,4,,0,,,2,2,35,1,0,2,1\n2024-02-01 01:00:00,2024-02-01 09:00:00,NBS,36,28,240,5,,,,,,,,,-88,100,50,7,0,0,0,0,12,,5,,100,KNYC,,4,25,6,,0,,,3,2,30,2,0,3,1\n2024-02-01 01:00:00,2024-02-01 12:00:00,NBS,3"
+    },
+    "NBS 2025-06-01": {
+      "http": 200,
+      "rows": 92,
+      "columns": [
+        "runtime",
+        "ftime",
+        "model",
+        "tmp",
+        "dpt",
+        "wdr",
+        "wsp",
+        "p06",
+        "p12",
+        "q06",
+        "q12",
+        "t06_1",
+        "t06_2",
+        "t12_1",
+        "t12_2",
+        "cig",
+        "vis",
+        "sky",
+        "gst",
+        "t03",
+        "pzr",
+        "psn",
+        "ppl",
+        "pra",
+        "s06",
+        "slv",
+        "i06",
+        "lcb",
+        "station",
+        "dur",
+        "mht",
+        "twd",
+        "tws",
+        "hid",
+        "sol",
+        "txn",
+        "xnd",
+        "tsd",
+        "dsd",
+        "ssd",
+        "gsd",
+        "ifc",
+        "ifv",
+        "wsd"
+      ],
+      "sample": "runtime,ftime,model,tmp,dpt,wdr,wsp,p06,p12,q06,q12,t06_1,t06_2,t12_1,t12_2,cig,vis,sky,gst,t03,pzr,psn,ppl,pra,s06,slv,i06,lcb,station,dur,mht,twd,tws,hid,sol,txn,xnd,tsd,dsd,ssd,gsd,ifc,ifv,wsd\n2025-06-01 01:00:00,2025-06-01 06:00:00,NBS,54,41,270,7,,,,,3.0,,,,-88,100,22,15,0,0,0,0,0,,48,,120,KNYC,,25,28,12,,0,,,2,2,27,3,0,0,1\n2025-06-01 01:00:00,2025-06-01 09:00:00,NBS,52,41,270,7,,,,,,,,,-88,100,8,16,0,0,0,0,0,,42,,60,KNYC,,18,28,13,,0,,,2,2,14,3,0,0,1\n2025-06-01 01:00:00,2025-06-01 12:00:00"
+    },
+    "NBS 2026-11-11": {
+      "http": 200,
+      "rows": 92,
+      "columns": [
+        "runtime",
+        "ftime",
+        "model",
+        "tmp",
+        "dpt",
+        "wdr",
+        "wsp",
+        "p06",
+        "p12",
+        "q06",
+        "q12",
+        "t06_1",
+        "t06_2",
+        "t12_1",
+        "t12_2",
+        "cig",
+        "vis",
+        "sky",
+        "gst",
+        "t03",
+        "pzr",
+        "psn",
+        "ppl",
+        "pra",
+        "s06",
+        "slv",
+        "i06",
+        "lcb",
+        "station",
+        "dur",
+        "mht",
+        "twd",
+        "tws",
+        "sol",
+        "txn",
+        "xnd",
+        "tsd",
+        "dsd",
+        "ssd",
+        "gsd",
+        "ifc",
+        "ifv",
+        "wsd",
+        "wbg",
+        "t06"
+      ],
+      "sample": "runtime,ftime,model,tmp,dpt,wdr,wsp,p06,p12,q06,q12,t06_1,t06_2,t12_1,t12_2,cig,vis,sky,gst,t03,pzr,psn,ppl,pra,s06,slv,i06,lcb,station,dur,mht,twd,tws,sol,txn,xnd,tsd,dsd,ssd,gsd,ifc,ifv,wsd,wbg,t06\n2026-11-11 00:00:00,2026-11-11 06:00:00,NBS,53,40,270,5,0.0,,0.0,,1.0,0.0,,,-88,100,4,12,0,0,0,0,0,0.0,40,0.0,230,KNYC,,4,29,10,0,,,2,2,5,2,0,0,1,49,1/0\n2026-11-11 00:00:00,2026-11-11 09:00:00,NBS,50,40,270,4,,,,,,,,,-88,100,4,10,0,0,0,0,0,,40,,100,KNYC,,4,29,8,0,,,2,2,5,2,0,0,1,46,\n2026-11-11 00:00"
+    },
+    "NBE 2024-02-01": {
+      "http": 200,
+      "rows": 92,
+      "columns": [
+        "runtime",
+        "ftime",
+        "model",
+        "tmp",
+        "dpt",
+        "wdr",
+        "wsp",
+        "p12",
+        "q12",
+        "t12_1",
+        "t12_2",
+        "sky",
+        "gst",
+        "pzr",
+        "psn",
+        "ppl",
+        "pra",
+        "slv",
+        "station",
+        "dur",
+        "sol",
+        "q24",
+        "p24",
+        "s12",
+        "i12",
+        "s24",
+        "txn",
+        "xnd",
+        "tsd",
+        "dsd",
+        "ssd",
+        "gsd",
+        "wsd",
+        "t12"
+      ],
+      "sample": "runtime,ftime,model,tmp,dpt,wdr,wsp,p12,q12,t12_1,t12_2,sky,gst,pzr,psn,ppl,pra,slv,station,dur,sol,q24,p24,s12,i12,s24,txn,xnd,tsd,dsd,ssd,gsd,wsd,t12\n2024-02-01 01:00:00,2024-02-02 00:00:00,NBE,45.0,32.0,240.0,7.0,5.0,0.0,1.0,0.0,73.0,11.0,0.0,0.0,0.0,2.0,24.0,KNYC,0.0,14.0,,,0.0,0.0,,48.0,1.0,1.0,1.0,30.0,2.0,1.0,1/0\n2024-02-01 01:00:00,2024-02-02 12:00:00,NBE,41.0,35.0,290.0,5.0,62.0,12.0,0.0,2.0,90.0,7.0,0.0,0.0,0.0,41.0,17.0,KNYC,9.0,0.0,12.0,,0.0,0.0,0.0,40.0,2.0,2.0,2.0,11.0,3.0,1.0,0/2\n"
+    },
+    "NBE 2025-06-01": {
+      "http": 200,
+      "rows": 92,
+      "columns": [
+        "runtime",
+        "ftime",
+        "model",
+        "tmp",
+        "dpt",
+        "wdr",
+        "wsp",
+        "p12",
+        "q12",
+        "t12_1",
+        "t12_2",
+        "sky",
+        "gst",
+        "pzr",
+        "psn",
+        "ppl",
+        "pra",
+        "slv",
+        "station",
+        "dur",
+        "sol",
+        "q24",
+        "p24",
+        "s12",
+        "i12",
+        "s24",
+        "txn",
+        "xnd",
+        "tsd",
+        "dsd",
+        "ssd",
+        "gsd",
+        "wsd",
+        "t12"
+      ],
+      "sample": "runtime,ftime,model,tmp,dpt,wdr,wsp,p12,q12,t12_1,t12_2,sky,gst,pzr,psn,ppl,pra,slv,station,dur,sol,q24,p24,s12,i12,s24,txn,xnd,tsd,dsd,ssd,gsd,wsd,t12\n2025-06-01 01:00:00,2025-06-02 00:00:00,NBE,64.0,39.0,270.0,4.0,0.0,0.0,11.0,2.0,30.0,11.0,0.0,0.0,0.0,0.0,54.0,KNYC,0.0,49.0,,,0.0,0.0,,68.0,2.0,2.0,2.0,29.0,3.0,2.0,11/2\n2025-06-01 01:00:00,2025-06-02 12:00:00,NBE,59.0,42.0,280.0,3.0,2.0,0.0,2.0,1.0,14.0,7.0,0.0,0.0,0.0,0.0,49.0,KNYC,0.0,13.0,0.0,,0.0,0.0,0.0,55.0,2.0,2.0,2.0,23.0,3.0,2.0,2/1\n2"
+    }
+  },
+  "hko": null
+}
