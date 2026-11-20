@@ -32,6 +32,8 @@ jobs:
     timeout-minutes: 330   # first-time setup downloads months of prices one market at a time
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: main   # always start from the latest saved data, not the commit that queued the run
 
       - uses: actions/setup-python@v6
         with:
@@ -71,7 +73,7 @@ jobs:
           git add data results
           if ! git diff --cached --quiet; then
             git commit -m "Data update $(date -u +%Y-%m-%d)"
-            git pull --rebase origin main
+            git pull --rebase -X theirs origin main   # on conflict, keep this run's data
             git push
           fi
 
