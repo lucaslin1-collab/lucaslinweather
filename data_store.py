@@ -78,8 +78,32 @@ def update_weather(city):
     obs = fetch_observed(city["station"], range(start.year, today.year + 1))
     new = fc.join(obs.loc[start:], how="outer")
     combined = new.combine_first(existing) if not existing.empty else new
+    combined = add_nbm(city, combined, existing, today)
     save_weather(city["series"], combined)
     return combined
+
+
+def add_nbm(city, combined, existing, today):
+    """Add the NWS station forecast (NBM) columns; backfill them in full the first time."""
+    from nbm import daily_guidance, fetch_runs
+    have = existing["nbm_txn"].dropna() if (not existing.empty and "nbm_txn" in existing) else pd.Series(dtype=float)
+    start = pd.Timestamp(config.WEATHER_START) if have.empty else have.index.max() - pd.Timedelta(days=5)
+    try:
+        runs = fetch_runs(city["station"], start - pd.Timedelta(days=2), today)
+        g = daily_guidance(runs, city, pd.date_range(start, today))
+    except Exception as err:  # noqa: BLE001
+        print(f"    {city['series']}: NWS station forecast unavailable ({err})")
+        return combined
+    if g.empty:
+        return combined
+    for col in ("nbm_txn", "nbm_xnd", "nbm_age_h"):
+        if col not in combined:
+            combined[col] = np.nan
+        combined.loc[g.index.intersection(combined.index), col] = g[col]
+        extra = g.index.difference(combined.index)
+        if len(extra):
+            combined = pd.concat([combined, g.loc[extra, [col]]]).groupby(level=0).first()
+    return combined.sort_index()
 
 
 # --- markets --------------------------------------------------------------------

@@ -63,12 +63,14 @@ def logit(p):
 # --- Stage 1: weather model ---------------------------------------------------------
 
 class HighTempModel:
-    """mu  = ridge regression on the model forecasts + seasonality (fixes each model's bias)
-    sigma = grows with disagreement between models (ensemble spread)."""
+    """mu  = ridge regression on the model forecasts, the NWS station forecast (NBM) and
+          seasonality (learns each source's bias at this station)
+    sigma = grows with disagreement between models and with NBM's own uncertainty."""
 
     def __init__(self, alpha=1.0, sigma_floor=1.0):
         self.alpha = alpha
         self.sigma_floor = sigma_floor
+        self.use_nbm_, self.xnd_fill_ = False, 2.0
 
     def _design(self, daily):
         daily = add_daily_features(daily)
@@ -80,11 +82,23 @@ class HighTempModel:
         if "ens2_mean" in daily:
             X["trend"] = (daily["ens1_mean"] - daily["ens2_mean"]).fillna(0.0)
         X["doy_sin"], X["doy_cos"] = daily["doy_sin"], daily["doy_cos"]
-        return X, daily["ens1_spread"].to_frame()
+        spread = daily["ens1_spread"].to_frame()
+        if self.use_nbm_:
+            # NWS station forecast; when a day lacks it, fall back to the model blend
+            has = daily["nbm_txn"].notna() if "nbm_txn" in daily else pd.Series(False, index=daily.index)
+            X["nbm"] = daily["nbm_txn"].where(has, daily["ens1_mean"]) if "nbm_txn" in daily else daily["ens1_mean"]
+            X["nbm_missing"] = (~has).astype(float)
+            xnd = daily["nbm_xnd"] if "nbm_xnd" in daily else pd.Series(np.nan, index=daily.index)
+            spread = spread.assign(nbm_xnd=xnd.fillna(self.xnd_fill_))
+        return X, spread
 
     def fit(self, daily):
         daily = daily.dropna(subset=["observed_high"])
         self.model_cols_ = sorted(c for c in daily.columns if c.startswith("fc1_"))
+        # use the NWS station forecast once there's enough of it to learn from
+        n_nbm = int(daily["nbm_txn"].notna().sum()) if "nbm_txn" in daily else 0
+        self.use_nbm_ = n_nbm >= 60
+        self.xnd_fill_ = float(daily["nbm_xnd"].median()) if self.use_nbm_ and daily["nbm_xnd"].notna().any() else 2.0
         X, spread = self._design(daily)
         ok = X["ens1_mean"].notna()
         X, spread, y = X[ok], spread[ok], daily.loc[ok, "observed_high"]

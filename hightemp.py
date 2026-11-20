@@ -72,6 +72,8 @@ def backtest_is_stale(cities):
     if not os.path.exists(path):
         return True
     s = json.load(open(path))
+    if s.get("features_version") != config.FEATURES_VERSION:
+        return True
     if pd.Timestamp.now() - pd.Timestamp(s.get("generated", "2000-01-01")) > pd.Timedelta(days=6):
         return True
     ready = {c for c in cities if not load_weather(c).empty and not load_markets(c).empty}

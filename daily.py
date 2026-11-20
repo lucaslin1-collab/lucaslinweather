@@ -170,6 +170,11 @@ def run(client, cities, update=True):
             update_markets(client, cities)
         except Exception as err:  # noqa: BLE001
             print(f"  market update failed ({err})")
+        try:
+            import intl_watch
+            intl_watch.check(client)
+        except Exception as err:  # noqa: BLE001
+            print(f"  international check failed ({err})")
     summary, blend = load_backtest()
     if summary is None:
         print("No backtest yet: every city shows as 'unproven'. Run `python hightemp.py backtest`.")

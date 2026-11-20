@@ -59,11 +59,24 @@ def site_footer():
 
 def today_page(panels, picks, summary, demo, generated):
     body = (nav("index.html") + header_html(panels, picks, generated, "Today’s high-temperature picks")
-            + notices_html(summary, demo) + picks_section(picks, record_href="record.html")
+            + notices_html(summary, demo) + intl_notice() + picks_section(picks, record_href="record.html")
             + boards_section(panels, picks) + site_footer())
     desc = ("Daily forecasts and AI picks for every Kalshi highest-temperature market, "
             "with an honest public track record.")
     return page(body, f"{config.SITE_NAME}: today’s picks", head("index.html", config.SITE_NAME, desc))
+
+
+def intl_notice():
+    try:
+        import intl_watch
+        w = intl_watch.load()
+    except Exception:  # noqa: BLE001
+        return ""
+    if not w or not w.get("open"):
+        return ""
+    names = ", ".join(v["title"] for v in w["open"].values())
+    return (f'<p class="notice">Kalshi has opened international daily-high markets: {esc(names)}. '
+            'The AI doesn’t price these yet.</p>')
 
 
 def picks_history(log, limit=60):
@@ -120,7 +133,8 @@ from each market’s contract rules rather than its title, because titles have b
 
 <h2>The forecast</h2>
 <p>Each morning the AI takes four global weather models’ forecasts (GFS, ECMWF, ICON and GEM) for
-that station. It corrects each model’s typical bias there, learned from past days. It then turns them
+that station, plus the National Weather Service’s own forecast for it: the National Blend of Models,
+from the latest run issued before 8 a.m. It corrects each model’s typical bias there, learned from past days. It then turns them
 into a full range of likely highs, which is wider on days when the models disagree. That range
 assigns a probability to every bracket.</p>
 

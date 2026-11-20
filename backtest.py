@@ -130,6 +130,7 @@ def run(cities):
     model_trades = simulate(preds, "p_model")
 
     summary = {"generated": pd.Timestamp.now().isoformat(timespec="minutes"),
+               "features_version": config.FEATURES_VERSION,
                "period": [f"{preds['date'].min():%Y-%m-%d}", f"{preds['date'].max():%Y-%m-%d}"],
                "overall": summarize(preds, trades),
                "model_only": summarize(preds, model_trades),
