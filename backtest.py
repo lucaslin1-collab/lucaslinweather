@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 import config
-from data_store import load_markets, load_weather
+from data_store import load_all_markets, load_weather
 from model import EPS, HighTempModel, MarketBlend
 from strategy import has_quote, select, settle_pnl
 
@@ -36,9 +36,11 @@ def bootstrap_ci(trades, n=2000, seed=0):
     return [float(np.percentile(totals, 5)), float(np.percentile(totals, 95))]
 
 
-def walk_forward(cities):
-    weather = {s: load_weather(s) for s in cities}
-    markets = pd.concat([load_markets(s) for s in cities], ignore_index=True)
+def walk_forward(cities, weather=None, markets=None):
+    """weather/markets can be supplied (the timing backtest passes entry-time variants)."""
+    weather = weather if weather is not None else {s: load_weather(s) for s in cities}
+    if markets is None:
+        markets = pd.concat([load_all_markets(s) for s in cities], ignore_index=True)
     if markets.empty:
         raise SystemExit("No market data yet. Run `python hightemp.py setup` first.")
     markets["mid"] = (markets["yes_bid"] + markets["yes_ask"]) / 2
@@ -131,6 +133,7 @@ def run(cities):
 
     summary = {"generated": pd.Timestamp.now().isoformat(timespec="minutes"),
                "features_version": config.FEATURES_VERSION,
+               "n_markets": int(sum(len(load_all_markets(s)) for s in cities)),   # all stored markets
                "period": [f"{preds['date'].min():%Y-%m-%d}", f"{preds['date'].max():%Y-%m-%d}"],
                "overall": summarize(preds, trades),
                "model_only": summarize(preds, model_trades),

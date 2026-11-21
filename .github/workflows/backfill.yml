@@ -1,0 +1,50 @@
+# Extends price history and collects prices/forecasts at several entry times, then runs the
+# timing backtest. Writes only its own files (markets_hist, quotes, nbm_slots, timing.json),
+# so it never collides with the daily run. Each run stops at its time budget; the next continues.
+name: Backfill history
+
+# GitHub runs scheduled jobs on a best-effort basis: they can start minutes to hours late.
+on:
+  push:
+    branches: [main]
+    paths: ["backfill.py", "timing.py", ".github/workflows/backfill.yml"]
+  schedule:
+    - cron: "17 3,9,17,21 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Backfill and timing backtest
+        env:
+          PYTHONUNBUFFERED: "1"
+          TIME_BUDGET_MIN: "230"
+        run: python hightemp.py backfill
+      - name: Save data back to the repo
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/markets_hist data/quotes data/nbm_slots data/backfill_meta.json results/timing.json 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "Backfill $(date -u +%Y-%m-%dT%H:%MZ)"
+            git pull --rebase -X theirs origin main
+            git push
+          fi

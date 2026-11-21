@@ -1,4 +1,5 @@
 """Read-only client for Kalshi's public market-data endpoints. It cannot place orders."""
+import threading
 import time
 
 import pandas as pd
@@ -30,15 +31,17 @@ class KalshiPublic:
         self.min_interval = min_interval  # stays under the basic-tier read limit
         self.max_retries = max_retries
         self._last_call = 0.0
+        self._lock = threading.Lock()   # several download threads share one rate limit
 
     def get(self, path, **params):
         params = {k: v for k, v in params.items() if v is not None}
         resp = None
         for attempt in range(self.max_retries):
-            wait = self.min_interval - (time.time() - self._last_call)
-            if wait > 0:
-                time.sleep(wait)
-            self._last_call = time.time()
+            with self._lock:
+                wait = self.min_interval - (time.time() - self._last_call)
+                if wait > 0:
+                    time.sleep(wait)
+                self._last_call = time.time()
             try:
                 resp = self.session.get(f"{self.bases[0]}{path}", params=params, timeout=30)
             except requests.ConnectionError:

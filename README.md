@@ -136,6 +136,24 @@ it's the time the backtest was scored at.
 Re-run `python hightemp.py backtest` every week or two so the verdicts include the latest
 results.
 
+## Backfill and the timing backtest
+
+A separate job, **Backfill history** (`.github/workflows/backfill.yml`), runs four times a day
+until it has caught up, then just keeps things current:
+
+- **Older prices:** extends Kalshi price history back to `MARKET_HISTORY_START` (January 2024),
+  or as far back as each city's markets go.
+- **Every entry time:** records each market's price at every entry time in `ENTRY_TIMES`. These
+  are noon and 6 p.m. the day before, and 5 a.m. and 8 a.m. on the day.
+- **NWS forecast at each entry time:** reconstructs the NWS station forecast as it stood at each
+  of those times.
+- **Timing backtest:** re-runs `timing.py`, which rebuilds the AI with only what was public at
+  each entry time. It shows the results as **Backtest by entry time** on the Track record page.
+
+The job writes only `data/markets_hist/`, `data/quotes/`, `data/nbm_slots/` and
+`results/timing.json`, so it never collides with the 8 a.m. run. Run it locally with
+`python hightemp.py backfill`.
+
 ## Settings (`config.py`)
 
 | Setting | Default | What it does |
@@ -177,6 +195,9 @@ results.
 | `daily.py` | Today's picks, the paper-trading log, and settlement |
 | `dashboard.py` | Builds `dashboard.html` and the shared page sections |
 | `website.py` | Builds the three-page website in `site/` |
+| `backfill.py` | Extends price history; prices and NWS forecasts at each entry time |
+| `timing.py` | Backtest by entry time |
+| `nbm.py` | NWS station forecast (National Blend of Models) |
 | `.github/workflows/update-site.yml` | Daily update and publishing on GitHub |
 | `synthetic.py` | Fake cities for `demo` |
 

@@ -48,7 +48,8 @@ LEADS = [1, 2]
 WEATHER_START = "2024-01-15"   # the forecast archive generally starts in January 2024
 
 # --- Market data ---------------------------------------------------------------------
-MARKET_HISTORY_DAYS = 240      # how far back `setup` pulls Kalshi prices (more = slower first run)
+MARKET_HISTORY_DAYS = 240      # how far back `setup` pulls Kalshi prices on a first run
+MARKET_HISTORY_START = "2024-01-15"   # the backfill job extends price history back to here
 DECISION_HOUR_LOCAL = 8        # prices and forecasts are taken at 08:00 local time on the day
 
 # --- Picks ------------------------------------------------------------------------------
@@ -64,6 +65,15 @@ MAX_STAKE_PCT = 0.02           # ...capped at this share of bankroll
 # Long downloads stop after this many minutes so the run can save its progress; the next
 # run continues where this one stopped. Unset = no limit (local runs).
 TIME_BUDGET_MIN = float(os.environ.get("TIME_BUDGET_MIN", "0") or 0)
+
+# Entry times the timing backtest compares, as hours from local midnight of the market's
+# day (negative = the day before). 8 a.m. is the time the daily picks use.
+ENTRY_TIMES = {
+    "d1_12": (-12, "Noon the day before"),
+    "d1_18": (-6, "6 p.m. the day before"),
+    "d0_05": (5, "5 a.m. on the day"),
+    "d0_08": (8, "8 a.m. on the day"),
+}
 
 # Bump when the model's inputs change, so the backtest re-runs on the next daily update.
 FEATURES_VERSION = 3   # 2 = adds the NWS station forecast (NBM); 3 = fixes which NBM value is the high

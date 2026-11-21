@@ -106,12 +106,51 @@ def picks_history(log, limit=60):
             f'<th class="num">Profit</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div></section>')
 
 
+def timing_section():
+    """Backtest by entry time, from results/timing.json (written by the backfill job)."""
+    import json
+    from dashboard import ORDER, verdict_badge
+    p = os.path.join(config.RESULTS_DIR, "timing.json")
+    if not os.path.exists(p):
+        return ""
+    t = json.load(open(p)).get("entry_times", {})
+    if not t:
+        return ""
+    rows = []
+    for slot, e in sorted(t.items(), key=lambda kv: kv[1]["hours"]):
+        o = e["overall"]
+        ci = o.get("ci90")
+        rows.append(f'<tr><td class="city">{esc(e["label"])}</td><td>{verdict_badge(o["verdict"])}</td>'
+                    f'<td class="num">{o.get("bss_model", float("nan")):+.3f}</td>'
+                    f'<td class="num">{o.get("bss_blend", float("nan")):+.3f}</td>'
+                    f'<td class="num">{o["trades"]}</td><td class="num">{o.get("bets_per_day", 0):.1f}</td>'
+                    f'<td class="num">{pct(o.get("win_rate"))}</td><td class="num strong">{money(o.get("pnl", 0.0))}</td>'
+                    f'<td class="num">{(money(ci[0]) + " to " + money(ci[1])) if ci else "–"}</td></tr>')
+    best = []
+    for slot, e in t.items():
+        for s, c in e["cities"].items():
+            if c["verdict"] == "edge":
+                best.append(f'{esc(c["city"])} at {esc(e["label"].lower())}')
+    note = (f'<p class="fine">Proven edge: {"; ".join(best)}.</p>' if best else
+            '<p class="fine">No entry time has a proven edge yet.</p>')
+    first = next(iter(t.values()))
+    return ('<section><h2>Backtest by entry time</h2><p class="fine">The same AI, rebuilt with only what '
+            'was public at each entry time: that moment’s prices, the latest NWS forecast run, and model '
+            'forecasts issued two days ahead for entries the day before. Each row is a separate test, '
+            f'{esc(first["period"][0])} to {esc(first["period"][1])}, with Kalshi’s fees included.</p>'
+            '<div class="scroll"><table class="cities"><thead><tr><th>Entry time</th><th>Verdict</th>'
+            '<th class="num">AI alone vs market</th><th class="num">Blended vs market</th><th class="num">Bets</th>'
+            '<th class="num">Per day</th><th class="num">Won</th><th class="num">Profit</th>'
+            f'<th class="num">90% range</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div>{note}</section>')
+
+
 def record_page(log, summary, demo, generated):
     intro = ('<header class="top"><h1>Track record</h1><p class="lede">Every pick is logged at the '
              'price it was published at and scored when the market settles, wins and losses alike. '
              f'Updated {generated:%B %-d, %-I:%M %p} ET.</p></header>')
     body = (nav("record.html") + intro + (notices_html(None, True).split('<p class="notice">')[0] if demo else "")
-            + record_section(log, summary, heading="Results so far") + picks_history(log) + site_footer())
+            + record_section(log, summary, heading="Results so far") + timing_section() + picks_history(log)
+            + site_footer())
     desc = "Every published pick and its result, plus a month-by-month backtest for each city."
     return page(body, f"Track record: {config.SITE_NAME}", head("record.html", "Track record", desc))
 

@@ -7,7 +7,7 @@ name: Update site
 on:
   push:
     branches: [main]
-    paths-ignore: ["data/**", "results/**", "README.md", "tools/**", ".github/workflows/inspect-series.yml"]
+    paths-ignore: ["data/**", "results/**", "README.md", "tools/**", ".github/workflows/inspect-series.yml", "backfill.py", "timing.py", ".github/workflows/backfill.yml"]
   schedule:
     - cron: "5 13 * * *"   # 13:05 UTC = 8:05 a.m. Eastern in winter, 9:05 in summer
   workflow_dispatch:

@@ -67,7 +67,7 @@ def cmd_setup(args):
 def backtest_is_stale(cities):
     """Re-run when the backtest is a week old or misses cities that now have data."""
     import json
-    from data_store import load_markets, load_weather
+    from data_store import load_all_markets, load_markets, load_weather
     path = os.path.join(config.RESULTS_DIR, "backtest.json")
     if not os.path.exists(path):
         return True
@@ -77,7 +77,30 @@ def backtest_is_stale(cities):
     if pd.Timestamp.now() - pd.Timestamp(s.get("generated", "2000-01-01")) > pd.Timedelta(days=6):
         return True
     ready = {c for c in cities if not load_weather(c).empty and not load_markets(c).empty}
-    return bool(ready - set(s.get("cities", {})))
+    if ready - set(s.get("cities", {})):
+        return True
+    # re-score when the backfill has added a lot of older markets
+    n_now = sum(len(load_all_markets(c)) for c in ready)
+    return n_now > 1.15 * s.get("n_markets", n_now)
+
+
+def cmd_backfill(args):
+    """Extend price history and entry-time data, then re-run the timing backtest when useful."""
+    import json
+    from cities import load_cities
+    from kalshi_client import KalshiPublic
+    import backfill
+    import timing
+    cities = load_cities()
+    before = backfill._meta()
+    done = backfill.run(KalshiPublic(), cities)
+    path = os.path.join(config.RESULTS_DIR, "timing.json")
+    age_h = (pd.Timestamp.now() - pd.Timestamp(json.load(open(path))["generated"])).total_seconds() / 3600 \
+        if os.path.exists(path) else 1e9
+    if age_h > 20 or backfill._meta() != before or done:
+        print("Timing backtest ...")
+        timing.run(cities)
+    print("Backfill complete." if done else "Backfill continues on the next run.")
 
 
 def cmd_backtest(args):
@@ -145,6 +168,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("setup").set_defaults(fn=cmd_setup)
+    sub.add_parser("backfill").set_defaults(fn=cmd_backfill)
     bt = sub.add_parser("backtest")
     bt.add_argument("--if-stale", action="store_true", help="only run if a week old or cities were added")
     bt.set_defaults(fn=cmd_backtest)

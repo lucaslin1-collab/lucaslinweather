@@ -58,9 +58,11 @@ def fetch_runs(station, start, end):
     return df.dropna(subset=["txn"]).drop_duplicates(["runtime", "ftime"])
 
 
-def daily_guidance(runs, city, dates, now=None):
+def daily_guidance(runs, city, dates, now=None, decision_hour=None):
     """For each local date D: the NBM daytime high and its uncertainty from the latest run
-    public before D's decision time (DECISION_HOUR_LOCAL), plus how old that run was."""
+    public before D's decision time, plus how old that run was. `decision_hour` is hours from
+    local midnight of D (negative = the day before); default DECISION_HOUR_LOCAL."""
+    decision_hour = config.DECISION_HOUR_LOCAL if decision_hour is None else decision_hour
     out = []
     if runs.empty:
         return pd.DataFrame(index=pd.DatetimeIndex([], name="date"), columns=["nbm_txn", "nbm_xnd", "nbm_age_h"])
@@ -69,7 +71,8 @@ def daily_guidance(runs, city, dates, now=None):
     now = now or pd.Timestamp.now(tz="UTC").tz_localize(None)
     for d in dates:
         d = pd.Timestamp(d)
-        decision = (d + pd.Timedelta(hours=config.DECISION_HOUR_LOCAL)).tz_localize(city["tz"]).tz_convert("UTC").tz_localize(None)
+        decision = (d + pd.Timedelta(hours=decision_hour)).tz_localize(city["tz"], nonexistent="shift_forward",
+                                                                       ambiguous=False).tz_convert("UTC").tz_localize(None)
         cutoff = min(decision, now) - LATENCY
         # NBM lists the daytime high for US stations at 00 UTC the next day (the 12-hour
         # max ending then); the low is listed at 12 UTC. Runs issued after 12 UTC no longer

@@ -118,6 +118,17 @@ def markets_path(series):
     return os.path.join(_dir("markets"), f"{series}.csv")
 
 
+def load_all_markets(series):
+    """Recent markets (daily run) plus older ones added by the backfill job."""
+    recent = load_markets(series)
+    p = os.path.join(_dir("markets_hist"), f"{series}.csv")
+    if not os.path.exists(p):
+        return recent
+    hist = pd.read_csv(p, parse_dates=["date"])
+    both = pd.concat([recent, hist], ignore_index=True) if not recent.empty else hist
+    return both.drop_duplicates("ticker", keep="first").sort_values(["date", "ticker"]).reset_index(drop=True)
+
+
 def load_markets(series):
     path = markets_path(series)
     if not os.path.exists(path):
