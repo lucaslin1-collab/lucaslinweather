@@ -3,12 +3,12 @@
   "open": {
     "KXHIGHTSATX": {
       "title": "San Antonio Daily Maximum Temperature",
-      "open_markets": 12,
+      "open_markets": 6,
       "sample_rules": "If the maximum temperature recorded at San Antonio (CLISAT) for Nov 21, 2026, is greater than 79\u00b0 fahrenheit according to The Weather Company, then the market resolves to Yes."
     },
     "KXHIGHTNOLA": {
       "title": "New Orleans Max temp Daily",
-      "open_markets": 12,
+      "open_markets": 6,
       "sample_rules": "If the maximum temperature recorded at New Orleans (CLIMSY) for Nov 21, 2026, is greater than 78\u00b0 fahrenheit according to The Weather Company, then the market resolves to Yes."
     }
   }
