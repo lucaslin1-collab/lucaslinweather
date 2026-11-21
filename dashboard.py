@@ -159,10 +159,10 @@ def notices_html(summary, demo):
     return "".join(out)
 
 
-def picks_section(picks, record_href="#record"):
-    out = ['<section><h2>Today’s bets</h2>']
+def picks_section(picks, record_href="#record", heading="Today’s bets", intro="", when="today"):
+    out = [f'<section><h2>{esc(heading)}</h2>{intro}']
     if picks.empty:
-        out.append(f'<p class="empty">Nothing today. The AI recommends a bracket only when its expected '
+        out.append(f'<p class="empty">Nothing {when}. The AI recommends a bracket only when its expected '
                    f'profit beats {config.EDGE_THRESHOLD * 100:.0f}¢ a contract after fees, the spread is '
                    f'at most {config.MAX_SPREAD * 100:.0f}¢, and the price is between '
                    f'{config.MIN_PRICE * 100:.0f}¢ and {config.MAX_PRICE * 100:.0f}¢.</p>')
@@ -215,7 +215,7 @@ def boards_section(panels, picks):
     return "".join(out)
 
 
-def record_section(log, summary, heading="Track record", anchor="record"):
+def record_section(log, summary, heading="Track record", anchor="record", table=True):
     out = [f'<section id="{anchor}"><h2>{esc(heading)}</h2>']
     settled = log[log["won"].notna()] if log is not None and not log.empty else pd.DataFrame()
     pending = 0 if log is None or log.empty else int(log["won"].isna().sum())
@@ -237,7 +237,8 @@ def record_section(log, summary, heading="Track record", anchor="record"):
         keys = "".join(f'<li><span class="key {c}-bg"></span>{esc(nm)}</li>' for nm, c, _ in series)
         out.append(f'<div class="sec-head"><h3>Cumulative profit, $1 per bet</h3>'
                    f'<ul class="legend">{keys}</ul></div>{equity_chart(series)}')
-    out.append(backtest_table(summary))
+    if table:
+        out.append(backtest_table(summary))
     out.append('</section>')
     return "".join(out)
 

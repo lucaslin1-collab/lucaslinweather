@@ -49,6 +49,19 @@ def markets_at(series, slot):
     return mk.drop(columns=["yes_bid", "yes_ask"], errors="ignore").merge(q, on="ticker", how="inner")
 
 
+def save_blend(slot, preds):
+    """Market blend fit on every out-of-sample prediction for this entry time, for live use."""
+    import pickle
+    from model import MarketBlend
+    from strategy import has_quote
+    q = preds[has_quote(preds) & preds["p_model"].notna()]
+    if len(q) < 200:
+        return
+    os.makedirs(config.RESULTS_DIR, exist_ok=True)
+    blend = MarketBlend().fit(q["p_model"], q["mid"], q["result"])
+    pickle.dump(blend, open(os.path.join(config.RESULTS_DIR, f"blend_{slot}.pkl"), "wb"))
+
+
 def run(cities):
     results = {"generated": pd.Timestamp.now().isoformat(timespec="minutes"), "entry_times": {}}
     for slot, (hours, label) in config.ENTRY_TIMES.items():
@@ -65,6 +78,7 @@ def run(cities):
             print(f"  {label}: skipped ({err})")
             continue
         trades = simulate(preds, "p_blend")
+        save_blend(slot, preds)
         entry = {"label": label, "hours": hours,
                  "period": [f"{preds['date'].min():%Y-%m-%d}", f"{preds['date'].max():%Y-%m-%d}"],
                  "overall": summarize(preds, trades), "cities": {}}

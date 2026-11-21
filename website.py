@@ -60,7 +60,7 @@ def site_footer():
 def today_page(panels, picks, summary, demo, generated):
     body = (nav("index.html") + header_html(panels, picks, generated, "Today’s high-temperature picks")
             + notices_html(summary, demo) + intl_notice() + picks_section(picks, record_href="record.html")
-            + boards_section(panels, picks) + site_footer())
+            + dayahead_section() + boards_section(panels, picks) + site_footer())
     desc = ("Daily forecasts and AI picks for every Kalshi highest-temperature market, "
             "with an honest public track record.")
     return page(body, f"{config.SITE_NAME}: today’s picks", head("index.html", config.SITE_NAME, desc))
@@ -79,7 +79,7 @@ def intl_notice():
             'The AI doesn’t price these yet.</p>')
 
 
-def picks_history(log, limit=60):
+def picks_history(log, limit=60, heading="Every logged pick"):
     if log is None or log.empty:
         return ""
     recent = log.sort_values(["date", "ev"], ascending=[False, False]).head(limit)
@@ -99,11 +99,50 @@ def picks_history(log, limit=60):
                     f'<td><span class="side {str(r.side).lower()}">Buy {esc(r.side)}</span></td>'
                     f'<td class="num">{r.price * 100:.0f}¢</td><td class="num">{pct(r.prob)}</td>'
                     f'<td>{result}</td><td class="num strong">{profit}</td></tr>')
-    return ('<section><h2>Every logged pick</h2><p class="fine">Newest first, at the price shown when '
+    return (f'<section><h2>{esc(heading)}</h2><p class="fine">Newest first, at the price shown when '
             'the pick was published. Profit is per $1 contract after fees.</p>'
             '<div class="scroll"><table class="log"><thead><tr><th>Date</th><th>City</th><th>Bracket</th>'
             '<th>Bet</th><th class="num">Price</th><th class="num">AI chance</th><th>Result</th>'
             f'<th class="num">Profit</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div></section>')
+
+
+def dayahead_log():
+    try:
+        import dayahead
+        return dayahead.load_dayahead_log()
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def dayahead_section():
+    """Tomorrow's picks from the midday day-before run (a separate paper test)."""
+    try:
+        import dayahead
+        st = dayahead.load_state()
+    except Exception:  # noqa: BLE001
+        return ""
+    if not st:
+        return ""
+    day = pd.Timestamp(st["target_date"])
+    made = pd.Timestamp(st["generated"])
+    intro = (f'<p class="fine">Paper test. In the backtest, buying around midday the day before beat '
+             f'buying at 8 a.m., so this run prices {day:%A}’s markets a day early. Picked '
+             f'{made:%b %-d at %-I:%M %p} ET, tracked separately in the '
+             f'<a href="record.html#dayahead">day-before record</a>.</p>')
+    return sort_and_section(st["picks"], f"Early bets for {day:%A, %B %-d}", intro)
+
+
+def sort_and_section(picks, heading, intro):
+    return picks_section(sort_picks(picks), record_href="record.html#dayahead", heading=heading, intro=intro,
+                         when="cleared the filters")
+
+
+def dayahead_record():
+    log = dayahead_log()
+    if log is None or log.empty:
+        return ('<section id="dayahead"><h2>Day-before picks</h2><p class="fine">A paper test of buying '
+                'around midday the day before. Its first picks will show here once they settle.</p></section>')
+    return record_section(log, None, heading="Day-before picks", anchor="dayahead", table=False)
 
 
 def timing_section():
@@ -149,7 +188,8 @@ def record_page(log, summary, demo, generated):
              'price it was published at and scored when the market settles, wins and losses alike. '
              f'Updated {generated:%B %-d, %-I:%M %p} ET.</p></header>')
     body = (nav("record.html") + intro + (notices_html(None, True).split('<p class="notice">')[0] if demo else "")
-            + record_section(log, summary, heading="Results so far") + timing_section() + picks_history(log)
+            + record_section(log, summary, heading="Results so far") + dayahead_record() + timing_section()
+            + picks_history(log) + picks_history(dayahead_log(), heading="Every day-before pick")
             + site_footer())
     desc = "Every published pick and its result, plus a month-by-month backtest for each city."
     return page(body, f"Track record: {config.SITE_NAME}", head("record.html", "Track record", desc))

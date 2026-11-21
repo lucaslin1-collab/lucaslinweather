@@ -10,12 +10,13 @@ on:
     paths-ignore: ["data/**", "results/**", "README.md", "tools/**", ".github/workflows/inspect-series.yml", "backfill.py", "timing.py", ".github/workflows/backfill.yml"]
   schedule:
     - cron: "5 13 * * *"   # 13:05 UTC = 8:05 a.m. Eastern in winter, 9:05 in summer
+    - cron: "7 19 * * *"   # day-before paper picks: 2 p.m. Eastern / 11 a.m. Pacific in winter
   workflow_dispatch:
     inputs:
       mode:
         description: "daily = normal update; setup = first run (downloads history, ~30-60 min); backtest = re-score cities"
         type: choice
-        options: [daily, setup, backtest]
+        options: [daily, setup, backtest, dayahead]
         default: daily
 
 permissions:
@@ -48,7 +49,7 @@ jobs:
 
       - name: Run the AI
         env:
-          MODE: ${{ github.event.inputs.mode || 'daily' }}
+          MODE: ${{ github.event.inputs.mode || (github.event.schedule == '7 19 * * *' && 'dayahead') || 'daily' }}
           PYTHONUNBUFFERED: "1"
           TIME_BUDGET_MIN: "240"   # long downloads stop here and continue next run
           SITE_URL: ${{ steps.pages.outputs.base_url }}
@@ -57,6 +58,8 @@ jobs:
           if [ "$MODE" = "setup" ] || [ ! -f results/backtest.json ]; then
             python hightemp.py setup
             python hightemp.py daily --no-update
+          elif [ "$MODE" = "dayahead" ]; then
+            python hightemp.py dayahead
           elif [ "$MODE" = "backtest" ]; then
             python hightemp.py daily
             python hightemp.py backtest

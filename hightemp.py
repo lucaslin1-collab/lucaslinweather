@@ -5,6 +5,7 @@ and writes a dashboard. It only recommends; it never places orders.
   python hightemp.py setup       first run: find cities, download history, backtest (~20-40 min)
   python hightemp.py daily       each morning around 8 local time: update, price today, dashboard
   python hightemp.py backtest    re-run the walk-forward backtest on the data you have
+  python hightemp.py dayahead    around midday: paper picks for tomorrow's markets (day-before test)
 """
 import argparse
 import os
@@ -24,6 +25,11 @@ def write_dashboard(panels, picks, log, summary, demo=False):
         fh.write(render(panels, picks, log, summary, demo=demo))
     print(f"\nDashboard: {path}")
     website.build(panels, picks, log, summary, demo=demo)
+    if not demo:   # so the midday day-before run can rebuild the site with this morning's picks
+        import pickle
+        os.makedirs(config.DATA_DIR, exist_ok=True)
+        pickle.dump({"panels": panels, "picks": picks, "summary": summary},
+                    open(os.path.join(config.DATA_DIR, "site_state.pkl"), "wb"))
     return path
 
 
@@ -123,6 +129,20 @@ def cmd_daily(args):
         webbrowser.open(f"file://{path}")
 
 
+def cmd_dayahead(args):
+    import pickle
+    from cities import load_cities
+    from kalshi_client import KalshiPublic
+    import daily
+    import dayahead
+    import website
+    print("Pricing tomorrow's markets (day-before paper test) ...")
+    dayahead.run(KalshiPublic(), load_cities())
+    p = os.path.join(config.DATA_DIR, "site_state.pkl")
+    st = pickle.load(open(p, "rb")) if os.path.exists(p) else {"panels": [], "picks": pd.DataFrame(), "summary": None}
+    website.build(st["panels"], st["picks"], daily.load_log(), st["summary"])
+
+
 def cmd_demo(args):
     config.DATA_DIR = os.path.join("demo", "data")
     config.RESULTS_DIR = os.path.join("demo", "results")
@@ -169,6 +189,7 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("setup").set_defaults(fn=cmd_setup)
     sub.add_parser("backfill").set_defaults(fn=cmd_backfill)
+    sub.add_parser("dayahead").set_defaults(fn=cmd_dayahead)
     bt = sub.add_parser("backtest")
     bt.add_argument("--if-stale", action="store_true", help="only run if a week old or cities were added")
     bt.set_defaults(fn=cmd_backtest)

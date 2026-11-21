@@ -105,28 +105,32 @@ LOG_COLS = ["date", "series", "city", "ticker", "label", "side", "price", "prob"
             "stake_pct", "verdict", "fee_mult", "logged_at", "won", "pnl"]
 
 
-def load_log():
-    path = picks_log_path()
+def load_log(path=None):
+    path = path or picks_log_path()
     if not os.path.exists(path):
         return pd.DataFrame(columns=LOG_COLS)
     return pd.read_csv(path, parse_dates=["date"])
 
 
-def log_picks(picks):
+def log_picks(picks, path=None):
     """Record each pick once, at the price first seen (no hindsight re-pricing)."""
-    log = load_log()
+    path = path or picks_log_path()
+    log = load_log(path)
     if not picks.empty:
         new = picks.assign(logged_at=pd.Timestamp.now().isoformat(timespec="minutes"),
                            won=np.nan, pnl=np.nan)[LOG_COLS]
         log = pd.concat([log, new], ignore_index=True).drop_duplicates(["date", "ticker"], keep="first")
     os.makedirs(config.DATA_DIR, exist_ok=True)
-    log.to_csv(picks_log_path(), index=False)
+    log.to_csv(path, index=False)
     return log
 
 
-def settle_log(client):
+def settle_log(client, path=None):
     """Fill in results for past picks whose markets have resolved."""
-    log = load_log()
+    path = path or picks_log_path()
+    log = load_log(path)
+    if log.empty:
+        return log
     pending = log[log["won"].isna() & (log["date"] < pd.Timestamp.now().normalize())]
     for idx, row in pending.iterrows():
         try:
@@ -136,7 +140,7 @@ def settle_log(client):
         if result in ("yes", "no"):
             won, pnl = settle_pnl(row["side"], row["price"], int(result == "yes"), row["fee_mult"])
             log.loc[idx, ["won", "pnl"]] = [won, pnl]
-    log.to_csv(picks_log_path(), index=False)
+    log.to_csv(path, index=False)
     return log
 
 
