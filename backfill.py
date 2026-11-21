@@ -198,7 +198,9 @@ def run(client, cities):
             print(f"  {series}: NWS forecast failed ({err})")
     print("Backfill: prices at each entry time ...")
     left = 0
-    for series, city in cities.items():
+    # least-complete cities first, so cities late in the list aren't starved by the time budget
+    order = sorted(cities, key=lambda s: _priced_share(s))
+    for series, city in ((s, cities[s]) for s in order):
         if out_of_time(reserve_min=20):
             left += 1
             continue
@@ -208,6 +210,16 @@ def run(client, cities):
         except Exception as err:  # noqa: BLE001
             print(f"  {series}: prices failed ({err})")
     return complete(cities)
+
+
+def _priced_share(series):
+    mk = pd.concat([x for x in (load_markets(series), _load("markets_hist", series)) if not x.empty],
+                   ignore_index=True)
+    if mk.empty:
+        return 1.0
+    q = _load("quotes", series)
+    done = set(q["ticker"]) if not q.empty else set()
+    return mk["ticker"].isin(done).mean()
 
 
 def complete(cities):
