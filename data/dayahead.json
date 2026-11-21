@@ -1,0 +1,263 @@
+{
+  "generated": "2026-11-21T17:05-05:00",
+  "target_date": "2026-11-22",
+  "picks": [
+    {
+      "date": "2026-11-22",
+      "series": "KXHIGHTOKC",
+      "city": "Oklahoma City",
+      "ticker": "KXHIGHTOKC-26NOV22-B61.5",
+      "label": "61\u201362\u00b0",
+      "side": "NO",
+      "price": 0.62,
+      "prob": 0.7479,
+      "ev": 0.1079,
+      "stake_pct": 0.02,
+      "verdict": "unproven"
+    },
+    {
+      "date": "2026-11-22",
+      "series": "KXHIGHLAX",
+      "city": "Los Angeles (LAX)",
+      "ticker": "KXHIGHLAX-26NOV22-B69.5",
+      "label": "69\u201370\u00b0",
+      "side": "YES",
+      "price": 0.21,
+      "prob": 0.2788,
+      "ev": 0.0488,
+      "stake_pct": 0.02,
+      "verdict": "edge"
+    },
+    {
+      "date": "2026-11-22",
+      "series": "KXHIGHNY",
+      "city": "New York (Central Park)",
+      "ticker": "KXHIGHNY-26NOV22-T61",
+      "label": "\u226460\u00b0",
+      "side": "NO",
+      "price": 0.45,
+      "prob": 0.5156,
+      "ev": 0.0456,
+      "stake_pct": 0.02,
+      "verdict": "edge"
+    }
+  ],
+  "panels": [
+    {
+      "series": "KXHIGHAUS",
+      "city": "Austin",
+      "date": "2026-11-22",
+      "mu": 75.3,
+      "sigma": 3.4,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHCHI",
+      "city": "Chicago (Midway)",
+      "date": "2026-11-22",
+      "mu": 62.0,
+      "sigma": 3.2,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHTSATX",
+      "city": "San Antonio",
+      "date": "2026-11-22",
+      "mu": 73.0,
+      "sigma": 3.0,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHNY",
+      "city": "New York (Central Park)",
+      "date": "2026-11-22",
+      "mu": 63.3,
+      "sigma": 2.3,
+      "note": "",
+      "verdict": "edge"
+    },
+    {
+      "series": "KXHIGHTBOS",
+      "city": "Boston",
+      "date": "2026-11-22",
+      "mu": 62.2,
+      "sigma": 2.8,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHTTTN",
+      "city": "Trenton",
+      "date": "2026-11-22",
+      "mu": 62.9,
+      "sigma": 2.6,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHTOKC",
+      "city": "Oklahoma City",
+      "date": "2026-11-22",
+      "mu": 55.6,
+      "sigma": 3.1,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHTLV",
+      "city": "Las Vegas",
+      "date": "2026-11-22",
+      "mu": 57.6,
+      "sigma": 1.6,
+      "note": "",
+      "verdict": "edge"
+    },
+    {
+      "series": "KXHIGHTPHX",
+      "city": "Phoenix",
+      "date": "2026-11-22",
+      "mu": 74.2,
+      "sigma": 1.6,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHTDC",
+      "city": "Washington DC (DCA)",
+      "date": "2026-11-22",
+      "mu": 63.5,
+      "sigma": 3.1,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHPHIL",
+      "city": "Philadelphia",
+      "date": "2026-11-22",
+      "mu": 64.6,
+      "sigma": 3.2,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHTNOLA",
+      "city": "New Orleans",
+      "date": "2026-11-22",
+      "mu": 77.2,
+      "sigma": 2.2,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHDEN",
+      "city": "Denver",
+      "date": "2026-11-22",
+      "mu": 46.3,
+      "sigma": 3.4,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHTEWR",
+      "city": "Newark",
+      "date": "2026-11-22",
+      "mu": 64.8,
+      "sigma": 2.9,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHTATL",
+      "city": "Atlanta",
+      "date": "2026-11-22",
+      "mu": 68.0,
+      "sigma": 4.7,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHTSFO",
+      "city": "San Francisco (SFO)",
+      "date": "2026-11-22",
+      "mu": 55.4,
+      "sigma": 2.0,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHLAX",
+      "city": "Los Angeles (LAX)",
+      "date": "2026-11-22",
+      "mu": 69.1,
+      "sigma": 1.3,
+      "note": "",
+      "verdict": "edge"
+    },
+    {
+      "series": "KXHIGHTSAN",
+      "city": "San Diego",
+      "date": "2026-11-22",
+      "mu": 71.8,
+      "sigma": 1.2,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHTSEA",
+      "city": "Seattle",
+      "date": "2026-11-22",
+      "mu": 48.7,
+      "sigma": 2.1,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHMIA",
+      "city": "Miami",
+      "date": "2026-11-22",
+      "mu": 86.5,
+      "sigma": 1.8,
+      "note": "",
+      "verdict": "edge"
+    },
+    {
+      "series": "KXHIGHTDAL",
+      "city": "Dallas (DFW)",
+      "date": "2026-11-22",
+      "mu": 68.9,
+      "sigma": 3.2,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHTMIN",
+      "city": "Minneapolis",
+      "date": "2026-11-22",
+      "mu": 44.3,
+      "sigma": 2.4,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHTHOU",
+      "city": "Houston (Hobby)",
+      "date": "2026-11-22",
+      "mu": 82.3,
+      "sigma": 2.0,
+      "note": "",
+      "verdict": "unproven"
+    },
+    {
+      "series": "KXHIGHTSDF",
+      "city": "Louisville",
+      "date": "2026-11-22",
+      "mu": 72.9,
+      "sigma": 2.9,
+      "note": "",
+      "verdict": "unproven"
+    }
+  ]
+}
