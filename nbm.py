@@ -18,6 +18,7 @@ import config
 IEM_MOS = "https://mesonet.agron.iastate.edu/cgi-bin/request/mos.py"
 UA = {"User-Agent": "lucaslinweather (research bot)"}
 LATENCY = pd.Timedelta(minutes=75)   # NBM text is usually public about an hour after its run time
+NBM_VERSION = 2                      # bump to re-download history when the parsing changes
 
 
 def fetch_runs(station, start, end):
@@ -30,22 +31,23 @@ def fetch_runs(station, start, end):
         params = {"station": station, "model": "NBS", "sts": f"{s:%Y-%m-%dT%H:%M}Z",
                   "ets": f"{e:%Y-%m-%dT%H:%M}Z", "format": "csv"}
         resp = None
-        for attempt in range(5):
+        for attempt in range(6):
             try:
                 resp = requests.get(IEM_MOS, params=params, headers=UA, timeout=180)
             except (requests.Timeout, requests.ConnectionError):
-                time.sleep(15 * (attempt + 1))
+                time.sleep(20 * (attempt + 1))
                 continue
-            if resp.status_code in (429, 502, 503, 504):
-                time.sleep(15 * (attempt + 1))
+            # Iowa State answers "Too many requests from your IP address, slow down." when busy
+            if resp.status_code in (429, 502, 503, 504) or resp.text.startswith("Too many requests"):
+                time.sleep(30 * (attempt + 1))
                 continue
             break
-        if resp is None or resp.status_code != 200 or "," not in resp.text[:200]:
-            continue
+        if resp is None or resp.status_code != 200 or not resp.text.startswith("runtime"):
+            raise RuntimeError(f"NBM archive unavailable for {station} {ms:%Y-%m}")
         df = pd.read_csv(io.StringIO(resp.text), usecols=lambda c: c in ("runtime", "ftime", "txn", "xnd"))
         if len(df):
             frames.append(df)
-        time.sleep(0.5)
+        time.sleep(2.0)   # stay well under the archive's rate limit
     if not frames:
         return pd.DataFrame(columns=["runtime", "ftime", "txn", "xnd"])
     df = pd.concat(frames, ignore_index=True)
@@ -69,21 +71,22 @@ def daily_guidance(runs, city, dates, now=None):
         d = pd.Timestamp(d)
         decision = (d + pd.Timedelta(hours=config.DECISION_HOUR_LOCAL)).tz_localize(city["tz"]).tz_convert("UTC").tz_localize(None)
         cutoff = min(decision, now) - LATENCY
+        # NBM lists the daytime high for US stations at 00 UTC the next day (the 12-hour
+        # max ending then); the low is listed at 12 UTC. Runs issued after 12 UTC no longer
+        # include the current day's high, so walk back to the latest run that does.
+        target = d + pd.Timedelta(days=1)
         i = np.searchsorted(runtimes, np.datetime64(cutoff), side="right") - 1
-        if i < 0:
-            continue
-        rt = pd.Timestamp(runtimes[i])
-        if decision - rt > pd.Timedelta(hours=30):
-            continue
-        # daytime max for local day D: the larger txn value whose valid time falls between
-        # mid-afternoon on D and early morning on D+1 (local standard time)
-        day0 = d - pd.Timedelta(hours=city["std_offset"])
-        run = by_run[rt]
-        win = run[(run["ftime"] >= day0 + pd.Timedelta(hours=14)) & (run["ftime"] <= day0 + pd.Timedelta(hours=30))]
-        if win.empty:
-            continue
-        best = win.loc[win["txn"].idxmax()]
-        out.append({"date": d, "nbm_txn": float(best["txn"]), "nbm_xnd": float(best["xnd"]) if pd.notna(best["xnd"]) else np.nan,
-                    "nbm_age_h": (decision - rt).total_seconds() / 3600})
+        while i >= 0:
+            rt = pd.Timestamp(runtimes[i])
+            if decision - rt > pd.Timedelta(hours=30):
+                break
+            row = by_run[rt][by_run[rt]["ftime"] == target]
+            if len(row):
+                r = row.iloc[0]
+                out.append({"date": d, "nbm_txn": float(r["txn"]),
+                            "nbm_xnd": float(r["xnd"]) if pd.notna(r["xnd"]) else np.nan,
+                            "nbm_age_h": (decision - rt).total_seconds() / 3600})
+                break
+            i -= 1
     return pd.DataFrame(out).set_index("date") if out else \
         pd.DataFrame(index=pd.DatetimeIndex([], name="date"), columns=["nbm_txn", "nbm_xnd", "nbm_age_h"])

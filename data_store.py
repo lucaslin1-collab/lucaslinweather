@@ -85,9 +85,11 @@ def update_weather(city):
 
 def add_nbm(city, combined, existing, today):
     """Add the NWS station forecast (NBM) columns; backfill them in full the first time."""
-    from nbm import daily_guidance, fetch_runs
+    from nbm import NBM_VERSION, daily_guidance, fetch_runs
     have = existing["nbm_txn"].dropna() if (not existing.empty and "nbm_txn" in existing) else pd.Series(dtype=float)
-    start = pd.Timestamp(config.WEATHER_START) if have.empty else have.index.max() - pd.Timedelta(days=5)
+    current = (not existing.empty and "nbm_ver" in existing and existing["nbm_ver"].max() == NBM_VERSION)
+    full = have.empty or not current
+    start = pd.Timestamp(config.WEATHER_START) if full else have.index.max() - pd.Timedelta(days=5)
     try:
         runs = fetch_runs(city["station"], start - pd.Timedelta(days=2), today)
         g = daily_guidance(runs, city, pd.date_range(start, today))
@@ -96,7 +98,11 @@ def add_nbm(city, combined, existing, today):
         return combined
     if g.empty:
         return combined
-    for col in ("nbm_txn", "nbm_xnd", "nbm_age_h"):
+    if full:   # replace history parsed by an older version
+        for col in ("nbm_txn", "nbm_xnd", "nbm_age_h"):
+            combined[col] = np.nan
+    g["nbm_ver"] = NBM_VERSION
+    for col in ("nbm_txn", "nbm_xnd", "nbm_age_h", "nbm_ver"):
         if col not in combined:
             combined[col] = np.nan
         combined.loc[g.index.intersection(combined.index), col] = g[col]

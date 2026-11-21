@@ -66,7 +66,7 @@ MAX_STAKE_PCT = 0.02           # ...capped at this share of bankroll
 TIME_BUDGET_MIN = float(os.environ.get("TIME_BUDGET_MIN", "0") or 0)
 
 # Bump when the model's inputs change, so the backtest re-runs on the next daily update.
-FEATURES_VERSION = 2   # 2 = adds the NWS station forecast (NBM)
+FEATURES_VERSION = 3   # 2 = adds the NWS station forecast (NBM); 3 = fixes which NBM value is the high
 
 # --- Backtest ------------------------------------------------------------------------
 MIN_TRAIN_DAYS = 120
