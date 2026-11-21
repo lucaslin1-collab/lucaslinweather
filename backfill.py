@@ -227,6 +227,8 @@ def complete(cities):
     for s in cities:
         mk = pd.concat([x for x in (load_markets(s), _load("markets_hist", s)) if not x.empty], ignore_index=True)
         q = _load("quotes", s)
-        if mk.empty or q.empty or not set(mk["ticker"]) <= set(q["ticker"]) or _load("nbm_slots", s).empty:
+        # a handful of archived markets fail to download every time; 99.5% priced counts as done
+        if mk.empty or q.empty or mk["ticker"].isin(set(q["ticker"])).mean() < 0.995 \
+                or _load("nbm_slots", s).empty:
             return False
     return True
