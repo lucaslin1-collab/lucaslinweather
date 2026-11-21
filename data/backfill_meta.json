@@ -1,0 +1,122 @@
+{
+  "KXHIGHAUS": {
+    "history_listed": true,
+    "older_markets": 4769,
+    "earliest": "2024-01-15"
+  },
+  "KXHIGHCHI": {
+    "history_listed": true,
+    "older_markets": 4775,
+    "earliest": "2024-01-15"
+  },
+  "KXHIGHTSATX": {
+    "history_listed": true,
+    "older_markets": 246,
+    "earliest": "2026-02-11"
+  },
+  "KXHIGHNY": {
+    "history_listed": true,
+    "older_markets": 4769,
+    "earliest": "2024-01-15"
+  },
+  "KXHIGHTBOS": {
+    "history_listed": true,
+    "older_markets": 282,
+    "earliest": "2026-02-05"
+  },
+  "KXHIGHTTTN": {
+    "history_listed": true,
+    "older_markets": 0,
+    "earliest": null
+  },
+  "KXHIGHTOKC": {
+    "history_listed": true,
+    "older_markets": 246,
+    "earliest": "2026-02-11"
+  },
+  "KXHIGHTLV": {
+    "history_listed": true,
+    "older_markets": 414,
+    "earliest": "2026-01-14"
+  },
+  "KXHIGHTPHX": {
+    "history_listed": true,
+    "older_markets": 288,
+    "earliest": "2026-02-04"
+  },
+  "KXHIGHTDC": {
+    "history_listed": true,
+    "older_markets": 378,
+    "earliest": "2026-01-14"
+  },
+  "KXHIGHPHIL": {
+    "history_listed": true,
+    "older_markets": 2909,
+    "earliest": "2024-11-20"
+  },
+  "KXHIGHTNOLA": {
+    "history_listed": true,
+    "older_markets": 414,
+    "earliest": "2026-01-14"
+  },
+  "KXHIGHDEN": {
+    "history_listed": true,
+    "older_markets": 2909,
+    "earliest": "2024-11-20"
+  },
+  "KXHIGHTEWR": {
+    "history_listed": true,
+    "older_markets": 0,
+    "earliest": null
+  },
+  "KXHIGHTATL": {
+    "history_listed": true,
+    "older_markets": 288,
+    "earliest": "2026-02-04"
+  },
+  "KXHIGHTSFO": {
+    "history_listed": true,
+    "older_markets": 414,
+    "earliest": "2026-01-14"
+  },
+  "KXHIGHLAX": {
+    "history_listed": true,
+    "older_markets": 2633,
+    "earliest": "2025-01-05"
+  },
+  "KXHIGHTSAN": {
+    "history_listed": true,
+    "older_markets": 0,
+    "earliest": null
+  },
+  "KXHIGHTSEA": {
+    "history_listed": true,
+    "older_markets": 414,
+    "earliest": "2026-01-14"
+  },
+  "KXHIGHMIA": {
+    "history_listed": true,
+    "older_markets": 4769,
+    "earliest": "2024-01-15"
+  },
+  "KXHIGHTDAL": {
+    "history_listed": true,
+    "older_markets": 246,
+    "earliest": "2026-02-11"
+  },
+  "KXHIGHTMIN": {
+    "history_listed": true,
+    "older_markets": 288,
+    "earliest": "2026-02-04"
+  },
+  "KXHIGHTHOU": {
+    "history_listed": true,
+    "older_markets": 246,
+    "earliest": "2026-02-11"
+  },
+  "KXHIGHTSDF": {
+    "history_listed": true,
+    "older_markets": 0,
+    "earliest": null
+  }
+}
