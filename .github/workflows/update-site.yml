@@ -8,9 +8,8 @@ on:
   push:
     branches: [main]
     paths-ignore: ["data/**", "results/**", "README.md", "tools/**", ".github/workflows/inspect-series.yml", "backfill.py", "timing.py", ".github/workflows/backfill.yml"]
-  schedule:
-    - cron: "5 13 * * *"   # 13:05 UTC = 8:05 a.m. Eastern in winter, 9:05 in summer
-    - cron: "7 19 * * *"   # day-before paper picks: 2 p.m. Eastern / 11 a.m. Pacific in winter
+  # Started on time by cron-job.org (GitHub's own schedule ran hours late):
+  #   8:05 a.m. Eastern  mode=daily     |  2:07 p.m. Eastern  mode=dayahead
   workflow_dispatch:
     inputs:
       mode:
