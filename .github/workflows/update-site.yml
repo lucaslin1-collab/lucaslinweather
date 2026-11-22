@@ -5,9 +5,8 @@ name: Update site
 
 # GitHub runs scheduled jobs on a best-effort basis: they can start minutes to hours late.
 on:
-  push:
-    branches: [main]
-    paths-ignore: ["data/**", "results/**", "README.md", "tools/**", ".github/workflows/inspect-series.yml", "backfill.py", "timing.py", ".github/workflows/backfill.yml"]
+  # No push trigger: a run started by a code push would log picks at whatever time it ran.
+  # New code takes effect at the next cron-job.org run (or start one by hand under Actions).
   # Started on time by cron-job.org (GitHub's own schedule ran hours late):
   #   8:05 a.m. Eastern  mode=daily     |  2:07 p.m. Eastern  mode=dayahead
   workflow_dispatch:
