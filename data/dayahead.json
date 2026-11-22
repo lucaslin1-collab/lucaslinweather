@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-21T17:05-05:00",
+  "generated": "2026-11-21T19:08-05:00",
   "target_date": "2026-11-22",
   "picks": [
     {
@@ -9,24 +9,11 @@
       "ticker": "KXHIGHTOKC-26NOV22-B61.5",
       "label": "61\u201362\u00b0",
       "side": "NO",
-      "price": 0.62,
-      "prob": 0.7479,
-      "ev": 0.1079,
+      "price": 0.68,
+      "prob": 0.7788,
+      "ev": 0.0788,
       "stake_pct": 0.02,
       "verdict": "unproven"
-    },
-    {
-      "date": "2026-11-22",
-      "series": "KXHIGHLAX",
-      "city": "Los Angeles (LAX)",
-      "ticker": "KXHIGHLAX-26NOV22-B69.5",
-      "label": "69\u201370\u00b0",
-      "side": "YES",
-      "price": 0.21,
-      "prob": 0.2788,
-      "ev": 0.0488,
-      "stake_pct": 0.02,
-      "verdict": "edge"
     },
     {
       "date": "2026-11-22",
@@ -35,9 +22,22 @@
       "ticker": "KXHIGHNY-26NOV22-T61",
       "label": "\u226460\u00b0",
       "side": "NO",
-      "price": 0.45,
-      "prob": 0.5156,
-      "ev": 0.0456,
+      "price": 0.47,
+      "prob": 0.5405,
+      "ev": 0.0505,
+      "stake_pct": 0.02,
+      "verdict": "edge"
+    },
+    {
+      "date": "2026-11-22",
+      "series": "KXHIGHLAX",
+      "city": "Los Angeles (LAX)",
+      "ticker": "KXHIGHLAX-26NOV22-B69.5",
+      "label": "69\u201370\u00b0",
+      "side": "YES",
+      "price": 0.2,
+      "prob": 0.2665,
+      "ev": 0.0465,
       "stake_pct": 0.02,
       "verdict": "edge"
     }
