@@ -1,1 +1,2 @@
 date,series,city,ticker,label,side,price,prob,ev,stake_pct,verdict,fee_mult,logged_at,won,pnl
+2026-11-22 00:00:00,KXHIGHLAX,Los Angeles (LAX),KXHIGHLAX-26NOV22-B65.5,65–66°,NO,0.88,0.9408004973234639,0.05080049732346393,0.02,edge,1.0,2026-11-22T13:39,,
