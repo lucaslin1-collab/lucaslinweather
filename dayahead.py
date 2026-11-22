@@ -89,6 +89,7 @@ def run(client, cities):
             candidates.append(priced.assign(city=city["city"], verdict=panel["verdict"]))
     picks = select(pd.concat(candidates, ignore_index=True), "p_final") if candidates else pd.DataFrame()
     settle_log(client, path=log_path())
+    settle_log(client)   # also score the 8 a.m. picks, in case they settled after the morning run
     log = log_picks(picks, path=log_path())
     print_picks(picks)
     save_state(panels, picks)
