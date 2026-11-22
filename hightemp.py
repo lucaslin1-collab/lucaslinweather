@@ -87,7 +87,8 @@ def backtest_is_stale(cities):
         return True
     # re-score when the backfill has added a lot of older markets
     n_now = sum(len(load_all_markets(c)) for c in ready)
-    return n_now > 1.15 * s.get("n_markets", n_now)
+    n_was = s.get("n_markets") or s.get("overall", {}).get("markets") or 0
+    return n_now > 1.15 * n_was
 
 
 def cmd_backfill(args):

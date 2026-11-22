@@ -43,7 +43,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/markets_hist data/quotes data/nbm_slots data/backfill_meta.json results/timing.json 2>/dev/null || true
-          git add results/blend_*.pkl 2>/dev/null || true
+          git add results/blend_*.pkl results/insights.json 2>/dev/null || true
           if ! git diff --cached --quiet; then
             git commit -m "Backfill $(date -u +%Y-%m-%dT%H:%MZ)"
             git pull --rebase -X theirs origin main

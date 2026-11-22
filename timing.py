@@ -64,6 +64,7 @@ def save_blend(slot, preds):
 
 def run(cities):
     results = {"generated": pd.Timestamp.now().isoformat(timespec="minutes"), "entry_times": {}}
+    collected = {}
     for slot, (hours, label) in config.ENTRY_TIMES.items():
         weather = {s: weather_at(s, slot) for s in cities}
         mk = [markets_at(s, slot) for s in cities]
@@ -79,6 +80,9 @@ def run(cities):
             continue
         trades = simulate(preds, "p_blend")
         save_blend(slot, preds)
+        if len(trades):
+            trades = trades.assign(city=trades["series"].map(lambda s: cities[s]["city"]))
+        collected[slot] = (label, preds, trades)
         entry = {"label": label, "hours": hours,
                  "period": [f"{preds['date'].min():%Y-%m-%d}", f"{preds['date'].max():%Y-%m-%d}"],
                  "overall": summarize(preds, trades), "cities": {}}
@@ -94,5 +98,8 @@ def run(cities):
               f"| {o['trades']} bets ({entry['overall']['bets_per_day']}/day) P&L ${o.get('pnl', 0):.2f} "
               f"range {[round(x, 1) for x in o.get('ci90', [0, 0])]} | {o['verdict']}")
     os.makedirs(config.RESULTS_DIR, exist_ok=True)
+    if collected:
+        import insights
+        insights.write(collected)
     json.dump(results, open(os.path.join(config.RESULTS_DIR, "timing.json"), "w"), indent=2, default=float)
     return results

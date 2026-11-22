@@ -145,6 +145,114 @@ def dayahead_record():
     return record_section(log, None, heading="Day-before picks", anchor="dayahead", table=False)
 
 
+def _usd(x):
+    if x is None:
+        return "–"
+    return f"−${abs(x):,.0f}" if x < -0.5 else f"${x:,.0f}"
+
+
+def _cents(r):
+    return "–" if r is None else f"{'+' if r >= 0 else '−'}{abs(r) * 100:.1f}¢"
+
+
+STATUS = {
+    "waiting": ("unproven", "No settled picks yet"),
+    "too early": ("unproven", "Too early to tell"),
+    "on track": ("edge", "On track"),
+    "losing, within luck": ("unproven", "Behind, but within luck"),
+    "behind": ("no edge", "Behind the backtest"),
+}
+
+
+def insights_section():
+    """Plain-language takeaways from results/insights.json, plus live picks vs backtest."""
+    import insights
+    from dashboard import verdict_badge
+    data = insights.load()
+    if not data:
+        return ""
+    et = data["entry_times"]
+    order = sorted(et, key=lambda s: config.ENTRY_TIMES.get(s, (99,))[0])
+    out = ['<section id="insights"><h2>Insights</h2>'
+           '<p class="fine">What the history says in dollars, and whether the paper picks are living up to it. '
+           f'Money assumes a flat ${data["stake"]} on every bet, after Kalshi’s fees. Refreshed with each backtest '
+           f'run; last {pd.Timestamp(data["generated"]):%B %-d}.</p>']
+
+    # 1. Is the edge holding?
+    import daily
+    rows = []
+    for name, slot, log in (("Day-before picks", "d1_12", dayahead_log()), ("8 a.m. picks", "d0_08", daily.load_log())):
+        if slot not in et:
+            continue
+        c = insights.compare_live(log, et[slot])
+        v, words = STATUS[c["status"]]
+        band = (f'{_cents(c["band"][0])} to {_cents(c["band"][1])}' if c["band"] else "–")
+        rows.append(f'<tr><td class="city">{name}</td><td class="num">{c["n"]} of {c["target"]}</td>'
+                    f'<td class="num strong">{_cents(c["actual"])}</td><td class="num">{_cents(c["expected"])}</td>'
+                    f'<td class="num">{band}</td><td>{verdict_badge(v).split("</span>")[0]}</span>{words}</span></td></tr>')
+    out.append('<h3>Is the edge holding?</h3><div class="scroll"><table class="cities"><thead><tr><th>Picks</th>'
+               '<th class="num">Settled</th><th class="num">Profit per $1, so far</th>'
+               '<th class="num">Backtest expects</th><th class="num">Normal luck range</th><th>Status</th></tr></thead>'
+               f'<tbody>{"".join(rows)}</tbody></table></div>'
+               '<p class="fine">The luck range is where results land 90% of the time if the backtest is right, and it '
+               f'narrows as picks settle. With an edge this small it takes about {insights.TARGET_PICKS} settled picks '
+               'to tell skill from luck.</p>')
+
+    # 2. What $100 a bet would have made
+    rows = []
+    for s in order:
+        e = et[s]
+        if not e.get("bets"):
+            continue
+        rows.append(f'<tr><td class="city">{esc(e["label"])}</td><td class="num">{e["bets_per_day"]:.1f}</td>'
+                    f'<td class="num">{_usd(e["per_bet"])}</td><td class="num">{_usd(e["per_day"])}</td>'
+                    f'<td class="num strong">{_usd(e["per_year"])}</td>'
+                    f'<td class="num">{_usd(e["range"][0])} to {_usd(e["range"][1])}</td>'
+                    f'<td class="num">{_usd(e["recent_per_year"])}</td><td class="num">{_usd(e["worst_month"])}</td></tr>')
+    d = et.get("d1_12", {})
+    best = d.get("best_only")
+    extra = (f' Taking only the single best-looking bet each day instead: about {best["bets_per_year"]:.0f} bets '
+             f'and {_usd(best["per_year"])} a year at the day-before time.' if best else "")
+    nob = (f' The day-before run places no bet on {d["no_bet_days"]:.0%} of days and up to '
+           f'{d["max_bets_day"]} on a busy one; a typical day has {d["median_bets_on_bet_days"]:.0f}.' if d.get("bets") else "")
+    out.append(f'<h3>What ${data["stake"]} a bet would have made</h3><div class="scroll"><table class="cities"><thead><tr>'
+               '<th>Entry time</th><th class="num">Bets a day</th><th class="num">Per bet</th>'
+               '<th class="num">Per day</th><th class="num">Per year</th><th class="num">Likely range, per year</th>'
+               f'<th class="num">Last {data["recent_days"]} days, per year</th><th class="num">Worst month</th></tr></thead>'
+               f'<tbody>{"".join(rows)}</tbody></table></div>'
+               f'<p class="fine">{nob}{extra} These assume every bet fills at the posted price. At ${data["stake"]} '
+               'a bet the day before, many markets don’t have that many contracts on offer, so real results '
+               'would be smaller.</p>')
+
+    # 3. How steady it is
+    halves = sorted({h for s in order for h in et[s].get("halves", {})})
+    if halves:
+        head = "".join(f'<th class="num">{esc(et[s]["label"])}</th>' for s in order)
+        body = []
+        for h in halves:
+            cells = "".join(f'<td class="num">{_cents(et[s].get("halves", {}).get(h, {}).get("ret"))}</td>' for s in order)
+            body.append(f'<tr><td class="city">{esc(h)}</td>{cells}</tr>')
+        for key, words in (("without_top1", "Without its best city"), ("without_top3", "Without its best 3 cities")):
+            cells = "".join(f'<td class="num">{_cents(et[s].get(key, {}).get("ret"))}</td>' for s in order)
+            body.append(f'<tr><td class="city">{words}</td>{cells}</tr>')
+        out.append('<h3>How steady it is</h3><p class="fine">Profit per $1 bet in each half-year, and with the '
+                   'best cities taken out. An edge that only shows up in a few cities or a few months is more '
+                   'likely to be luck.</p><div class="scroll"><table class="cities"><thead><tr><th>Period</th>'
+                   f'{head}</tr></thead><tbody>{"".join(body)}</tbody></table></div>')
+
+    # 4. Where the day-before money comes from
+    if d.get("top_cities"):
+        top = ", ".join(f'{esc(c["city"])} ({_usd(c["per_year"])})' for c in d["top_cities"])
+        bot = ", ".join(f'{esc(c["city"])} ({_usd(c["per_year"])})' for c in d["bottom_cities"])
+        w3 = d["without_top3"]
+        out.append('<h3>Where the day-before profit comes from</h3>'
+                   f'<p>Best cities, per year at ${data["stake"]} a bet: {top}. Weakest: {bot}. Without '
+                   f'{", ".join(esc(c) for c in w3["cities"])}, the rest would have made about '
+                   f'{_usd(w3["per_year"])} a year (likely range {_usd(w3["range"][0])} to {_usd(w3["range"][1])}).</p>')
+    out.append('</section>')
+    return "".join(out)
+
+
 def timing_section():
     """Backtest by entry time, from results/timing.json (written by the backfill job)."""
     import json
@@ -188,7 +296,7 @@ def record_page(log, summary, demo, generated):
              'price it was published at and scored when the market settles, wins and losses alike. '
              f'Updated {generated:%B %-d, %-I:%M %p} ET.</p></header>')
     body = (nav("record.html") + intro + (notices_html(None, True).split('<p class="notice">')[0] if demo else "")
-            + record_section(log, summary, heading="Results so far") + dayahead_record() + timing_section()
+            + record_section(log, summary, heading="Results so far") + dayahead_record() + insights_section() + timing_section()
             + picks_history(log) + picks_history(dayahead_log(), heading="Every day-before pick")
             + site_footer())
     desc = "Every published pick and its result, plus a month-by-month backtest for each city."

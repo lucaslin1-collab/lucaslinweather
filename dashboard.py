@@ -327,6 +327,7 @@ h1 .date{display:block;font:500 1.05rem/1.4 Barlow,sans-serif;color:var(--ink-2)
 h2{font:600 1.7rem/1.1 "Barlow Condensed",Barlow,sans-serif;margin:0 0 14px}
 h3{font-size:1rem;font-weight:600;margin:0}
 h3.sub{margin:28px 0 4px}
+#insights h3{margin:32px 0 10px}#insights h3+p{margin-top:0}
 .lede{color:var(--ink-2);max-width:62ch;margin:12px 0 0}
 section{margin-top:44px}
 .notice{margin:18px 0 0;padding:10px 14px;border-left:3px solid var(--warn);background:var(--surface);
