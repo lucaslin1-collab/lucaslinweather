@@ -4,12 +4,12 @@
     "KXHIGHTNOLA": {
       "title": "New Orleans Max temp Daily",
       "open_markets": 6,
-      "sample_rules": "If the maximum temperature recorded at New Orleans (CLIMSY) for Nov 27, 2026, is greater than 61\u00b0 fahrenheit according to The Weather Company, then the market resolves to Yes."
+      "sample_rules": "If the maximum temperature recorded at New Orleans (CLIMSY) for Nov 28, 2026, is greater than 70\u00b0 fahrenheit according to The Weather Company, then the market resolves to Yes."
     },
     "KXHIGHTSATX": {
       "title": "San Antonio Daily Maximum Temperature",
       "open_markets": 6,
-      "sample_rules": "If the maximum temperature recorded at San Antonio (CLISAT) for Nov 27, 2026, is greater than 68\u00b0 fahrenheit according to The Weather Company, then the market resolves to Yes."
+      "sample_rules": "If the maximum temperature recorded at San Antonio (CLISAT) for Nov 28, 2026, is greater than 77\u00b0 fahrenheit according to The Weather Company, then the market resolves to Yes."
     }
   }
 }
